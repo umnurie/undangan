@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Wedding of Robi & Astri</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playlist+Script&family=Roboto:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+    <style>
+        /* Variabel CSS untuk kemudahan kustomisasi */
+        :root {
+            --primary-font: 'Playlist Script', cursive; 
+            --secondary-font: 'Roboto', sans-serif; 
+            --bg-color: #FDF8F0; /* Krem / Beige */
+            --text-color: #17286e; /* Coklat Tua */
+            --accent-color: #69768b; /* Coklat Muda */
+            --white-color: #ffffff;
+            --gold-color: #dbb300;
+            --section-radius: 20px; /* Radius untuk rounded corners section */
+            --section-horizontal-margin: 2rem; /* Margin kiri dan kanan section agar mengambang */
+            --section-box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Efek shadow untuk section */
+            --couple-border-color: #69768b; /* Warna border foto mempelai */
+            --couple-border-width: 8px; /* Lebar border foto mempelai */
+        }
+
+        /* Reset CSS dasar untuk menghilangkan margin/padding default browser */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+
+        /* Gaya dasar body */
+        body {
+            font-family: var(--secondary-font);
+            color: var(--text-color);
+            text-align: center;
+            overflow-x: hidden; /* Mencegah scroll horizontal yang tidak diinginkan */
+            
+            /* Background image dari ImageKit (gambar utama undangan) */
+            background-image: url('https://ik.imagekit.io/lbhnem2y6/Undangan%20astri%20dan%20robi_20250626_071622_0000.png?updatedAt=1750912504964'); 
+            background-size: cover; 
+            background-repeat: no-repeat; 
+            background-attachment: fixed; /* Membuat gambar tetap saat menggulir */
+        }
+
+        /* Gaya tipografi untuk judul */
+        h1, h2, h3, h4 { 
+            font-family: var(--primary-font); 
+            font-weight: 700; 
+        }
+        h1 { font-size: 3.5rem; }
+        h2 { font-size: 2.5rem; margin-bottom: 2rem; }
+        h3 { font-size: 1.5rem; }
+        h4 { font-size: 1.2rem; font-weight: 400; }
+
+        /* Gaya umum untuk semua section, header, dan footer */
+        section, header, footer { 
+            padding: 4rem 2rem; /* Padding internal */
+            background-color: rgba(255, 255, 255, 0.7); /* Background putih transparan */
+            margin-bottom: 4rem; /* Jarak antar section */
+            border-radius: var(--section-radius); /* Sudut membulat */
+            position: center; /* Diperlukan untuk penempatan gambar di atas section */
+            margin-left: var(--section-horizontal-margin); /* Margin kiri untuk efek mengambang */
+            margin-right: var(--section-horizontal-margin); /* Margin kanan untuk efek mengambang */
+            box-shadow: var(--section-box-shadow); /* Efek shadow */
+        }
+        /* Menghapus margin-bottom dari footer terakhir agar tidak ada jarak berlebih di paling bawah */
+        footer {
+            margin-bottom: 0;
+        }
+
+        /* Gambar dekoratif di atas setiap section (kecuali cover) */
+        section::before, header::before, footer::before {
+            content: ''; /* Konten kosong agar pseudoelemen muncul */
+            position: absolute;
+            top: -40px; /* Posisi di atas section */
+            left: 50%;
+            transform: translateX(-50%); /* Pusatkan secara horizontal */
+            width: 200px; /* Lebar gambar */
+            height: 200px; /* Tinggi gambar */
+            background-image: url('https://ik.imagekit.io/lbhnem2y6/upscalemedia-transformed%20(1).png?updatedAt=1750921168313'); /* URL gambar bunga */
+            background-size: contain; /* Sesuaikan ukuran gambar agar pas */
+            background-repeat: no-repeat;
+            z-index: 1; /* Pastikan gambar berada di atas background section */
+        }
+        /* Menghilangkan gambar dekoratif untuk cover section */
+        .cover-section::before {
+            content: none;
+        }
+        /* Cover section tidak memiliki margin samping dan shadow */
+        .cover-section {
+            margin-left: 0;
+            margin-right: 0;
+            box-shadow: none;
+        }
+
+        /* Gaya untuk Cover Section (layar pembuka) */
+        .cover-section {
+            position: fixed; /* Tetap di layar */
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100vh; /* Mengambil seluruh tinggi viewport */
+            
+            /* Background cover dengan gambar galeri */
+            background: url('https://ik.imagekit.io/lbhnem2y6/undangan%20astri%20dan%20robi_20250627_133813_0000.png?updatedAt=1751006347524') no-repeat center center/cover;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            flex-direction: column;
+            color: var(--gold-color); 
+            z-index: 100; /* Pastikan di atas elemen lain */
+            transition: opacity 1s ease-in-out, visibility 1s ease-in-out; /* Animasi fade-out */
+        }
+        .cover-content { 
+            animation: fadeIn 2s ease-in-out; /* Animasi fade-in untuk konten cover */
+            position: relative; /* Untuk posisi absolute elemen anak */
+            height: 100%; /* Memastikan cover-content mengisi tinggi cover-section */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 100px; /* Memberi ruang di bawah untuk tombol */
+        }
+
+        /* Gaya untuk elemen-elemen di bagian bawah cover-content */
+        .cover-bottom-elements {
+            position: absolute; /* Posisikan kontainer ini secara absolut */
+            bottom: 100px; /* Sesuaikan jarak dari bawah */
+            left: 50%;
+            transform: translateX(-50%); /* Pusatkan secara horizontal */
+            width: 100%; /* Ambil lebar penuh cover-content */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #guest-name { 
+            margin: 2.5rem 0; /* Mengurangi margin bawah */
+            font-weight: 600; 
+            font-size: 1.2rem; 
+        }
+        #to-text {
+            margin-bottom: 0.2rem; /* Jarak antara teks "Kepada Yth." dan nama tamu */
+        }
+        #open-invitation {
+            background: var(--white-color); 
+            color: var(--text-color); 
+            border: none;
+            padding: 12px 30px; 
+            border-radius: 25px;
+            font-family: var(--secondary-font); 
+            cursor: pointer; 
+            font-weight: 600;
+            transition: transform 0.2s; /* Efek hover */
+            margin-top: 1rem; /* Jarak dari nama tamu ke tombol */
+            display: flex; /* Tambahkan ini untuk mensejajarkan ikon */
+            align-items: center; /* Tambahkan ini untuk mensejajarkan ikon */
+            gap: 8px; /* Jarak antara ikon dan teks */
+        }
+        #open-invitation:hover { 
+            transform: scale(1.05);
+        }
+
+        /* Kelas utilitas */
+        .hidden { 
+            display: none; 
+        }
+        .fade-out { 
+            opacity: 0; 
+            visibility: hidden; 
+        }
+        /* Keyframe untuk animasi fade-in */
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        /* Gaya untuk animasi elemen saat di-scroll (fade-in-up) */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in-up.visible { 
+            opacity: 1; 
+            transform: translateY(0); 
+        }
+
+        /* Gaya untuk Hero Section */
+        .hero-section {
+            min-height: 90vh; /* Tinggi minimum agar konten terlihat jelas */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Pastikan 'We Are Getting Married' dan 'Robi & Astri' di atas */
+            align-items: center; /* Untuk menengahkan semua elemen anak secara horizontal */
+            padding-top: 5rem; /* Tambahkan padding agar tidak terlalu mepet ke atas */
+            padding-bottom: 5rem; /* Tambahkan padding agar tidak terlalu mepet ke bawah */
+        }
+
+        /* Sesuaikan margin untuk elemen di bagian atas */
+        .hero-section h4 {
+            margin-top: 0; /* Hapus margin atas default */
+            margin-bottom: 0.5rem; /* Jarak antara h4 dan h1 */
+        }
+        .hero-section h1 {
+            margin-top: 0; /* Hapus margin atas default */
+            margin-bottom: 1.5rem; /* Jarak antara h1 dan div tanggal */
+        }
+
+        /* Gaya untuk membungkus hari dan tanggal */
+        .main-hero-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Untuk menengahkan hari dan tanggal di dalamnya secara vertikal */
+            align-items: center; /* Untuk menengahkan hari dan tanggal di dalamnya secara horizontal */
+            flex-grow: 1; /* Penting: agar div ini mengambil semua ruang vertikal yang tersedia */
+            width: 100%; /* Pastikan mengambil lebar penuh untuk centering horizontal */
+        }
+
+        #wedding-day {
+            font-family: var(--primary-font);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem; /* Jarak antara hari dan tanggal */
+            letter-spacing: 2px;
+            margin-top: 0; /* Pastikan tidak ada margin tambahan */
+        }
+        #wedding-date {
+            font-family: var(--primary-font);
+            font-size: 1.5rem;
+            margin: 0; /* Hapus semua margin default */
+            letter-spacing: 5px;
+        }
+
+        /* Tambahkan sedikit margin di atas countdown agar tidak terlalu mepet dengan tanggal */
+        .countdown {
+            margin-top: 2rem; /* Beri jarak antara div tanggal dan countdown */
+        }
+        .countdown { 
+            display: flex; 
+            gap: 0.5rem; 
+            margin-top: 2rem;
+            justify-content: center;
+        }
+        .countdown div {
+            background: rgb(222, 222, 222,0.5); /* Background kotak countdown transparan */
+            padding: 0.7rem;
+            border-radius: 10px; 
+            min-width: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .countdown span { 
+            display: block; 
+            font-size: 1rem; 
+            font-weight: 600; 
+        }
+      
+
+        /* Gaya untuk Couple Section (Mempelai) */
+        .couple-section .intro-text { 
+            max-width: 600px; 
+            margin: 0 auto 1rem auto; 
+            font-style: italic; 
+        }
+        .couple-section .intro-text-source { 
+            max-width: 600px; 
+            margin: 0 auto 3rem auto; 
+            font-weight: 600; 
+        }
+        .couple-details { 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; /* Mengatur alignment vertikal item */
+            gap: 3rem; 
+            flex-wrap: wrap; 
+        }
+        /* Kontainer untuk foto mempelai (memastikan lingkaran dan border) */
+        .couple-img-container {
+            width: 150px; 
+            height: 150px; 
+            border-radius: 50%; /* Membuat lingkaran */
+            overflow: hidden; /* Menyembunyikan bagian gambar yang keluar dari lingkaran */
+            margin-bottom: 1rem;
+            border: var(--couple-border-width) solid var(--couple-border-color); /* Border navy */
+            display: flex; /* Untuk memusatkan gambar di dalamnya */
+            justify-content: center;
+            align-items: center;
+        }
+        .couple-img {
+            width: 100%; /* Gambar mengisi kontainer */
+            height: 100%;
+            object-fit: cover; /* Pastikan gambar mengisi dan tidak distorsi */
+        }
+        /* Gaya teks nama dan orang tua */
+        .couple-details .name { 
+            font-family: var(--primary-font);
+            font-size: 1.8rem; 
+            text-align: center; /* Pusatkan teks */
+        }
+        .couple-details .parents { 
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            line-height: 1.5; 
+            text-align: center; /* Pusatkan teks */
+        }
+        /* Membuat setiap blok mempelai (bride/groom) rata tengah */
+        .bride, .groom {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Pusatkan konten vertikal */
+        }
+
+        /* Gaya untuk Event Section (Acara) */
+        .event-cards { 
+            display: flex; 
+            justify-content: center; 
+            gap: 2rem; 
+            flex-wrap: wrap; 
+        }
+        .card {
+            background: var(--white-color); /* Background putih untuk kartu acara */
+            padding: 2rem; 
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Shadow untuk kartu */
+            max-width: 350px; 
+            width: 100%;
+        }
+        .card h3 { 
+            margin-bottom: 1rem; 
+        }
+        .card p { 
+            line-height: 1.6; 
+        }
+        .btn {
+            display: inline-flex; /* Menggunakan flexbox untuk ikon dan teks */
+            align-items: center; /* Pusatkan secara vertikal */
+            justify-content: center; /* Pusatkan konten secara horizontal jika perlu */
+            gap: 8px; /* Jarak antara ikon dan teks */
+            background-color: var(--accent-color); 
+            color: var(--white-color);
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 25px;
+            margin-top: 1rem; 
+            font-weight: 600; 
+            transition: background-color 0.3s;
+        }
+        .btn:hover { 
+            background-color: var(--text-color); 
+        }
+
+        /* Gaya untuk Gallery Section - PERUBAHAN UTAMA DI SINI */
+        .gallery-section {
+            position: relative; /* Penting untuk posisi tombol dan dots */
+            overflow: hidden; /* Menyembunyikan gambar yang tidak aktif */
+            padding-bottom: 80px; /* Tambahan padding untuk dots */
+        }
+
+        .gallery-slides {
+            display: flex;
+            transition: transform 0.5s ease-in-out; /* Transisi halus saat slide berubah */
+            width: 100%; /* Memastikan kontainer slide mengisi lebar */
+        }
+
+        .gallery-slides img {
+            width: 100%; /* Setiap gambar mengambil 100% lebar kontainer */
+            flex-shrink: 0; /* Mencegah gambar menyusut */
+            height: 400px; /* Tinggi tetap untuk semua gambar */
+            object-fit: cover; /* Memastikan gambar mengisi area tanpa terdistorsi */
+            border-radius: 8px;
+        }
+
+        .slider-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            border-radius: 5px;
+            z-index: 10;
+        }
+
+        .slider-button.prev {
+            left: 10px;
+        }
+
+        .slider-button.next {
+            right: 10px;
+        }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 30px; /* Posisi dots di bawah gambar */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .dot {
+            height: 12px;
+            width: 12px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            display: inline-block;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: 1px solid var(--text-color); /* Border untuk dots */
+        }
+
+        .dot.active {
+            background-color: var(--accent-color); /* Warna dots aktif */
+        }
+
+        /* Gaya untuk RSVP Section */
+        .rsvp-section form { 
+            max-width: 500px; 
+            margin: 0 auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1rem; 
+        }
+        form input, form select, form textarea {
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #3e5ba3; 
+            border-radius: 5px;
+            font-family: var(--secondary-font); 
+            background: var(--white-color); 
+            font-size: 1rem;
+        }
+        form textarea { 
+            resize: vertical; 
+        }
+
+        /* Gaya untuk Gift Section */
+        .gift-section .gift-container { 
+            display: flex; 
+            justify-content: center; 
+            gap: 2rem; 
+            flex-wrap: wrap; 
+        }
+        .gift-card {
+            background: var(--white-color); /* Background putih untuk kartu hadiah */
+            padding: 2rem; 
+            border-radius: 8px;
+            max-width: 400px; 
+            margin: 1rem 0; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Shadow untuk kartu hadiah */
+            width: 100%;
+        }
+        .gift-card p { 
+            margin-bottom: 0.5rem; 
+            line-height: 1.6; 
+        }
+        .gift-card .account-number { 
+            font-weight: 600; 
+            font-size: 1.2rem; 
+        }
+        .btn-copy {
+            background-color: var(--accent-color); 
+            color: white; 
+            border: none; 
+            padding: 10px 15px;
+            border-radius: 25px; 
+            cursor: pointer; 
+            margin-top: 1rem; 
+            transition: background-color 0.3s;
+            display: inline-flex; /* Menggunakan flexbox untuk ikon dan teks */
+            align-items: center; /* Pusatkan secara vertikal */
+            justify-content: center; /* Pusatkan konten secara horizontal jika perlu */
+            gap: 8px; /* Jarak antara ikon dan teks */
+        }
+        .btn-copy:hover { 
+            background-color: var(--text-color); 
+        }
+
+        /* Gaya untuk Audio Player (musik latar) */
+        #audio-player { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            z-index: 99; /* Di atas sebagian besar elemen */
+        }
+        #play-pause-btn {
+            background: var(--accent-color); 
+            color: white; 
+            width: 50px; 
+            height: 50px;
+            border: none; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            font-size: 1.5rem;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        #play-pause-btn.playing .pause-icon { 
+            display: block; 
+        }
+        #play-pause-btn.playing .play-icon { 
+            display: none; 
+        }
+        #play-pause-btn .pause-icon { 
+            display: none; 
+        }
+
+        /* Responsive Design untuk perangkat kecil */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.8rem; }
+            h2 { font-size: 2rem; }
+            /* Sesuaikan padding dan margin untuk mobile */
+            section, header, footer { 
+                padding: 3rem 1rem; 
+                margin-bottom: 3rem; 
+                margin-left: 1rem; 
+                margin-right: 1rem; 
+            }
+            .couple-details { 
+                flex-direction: column; 
+                align-items: center; 
+            }
+            .gift-section .gift-container { 
+                flex-direction: column; 
+                align-items: center; 
+            }
+            /* Sesuaikan posisi tombol buka undangan untuk mobile */
+            .cover-bottom-elements {
+                bottom: 60px; /* Sedikit lebih ke atas di mobile */
+            }
+            #open-invitation {
+                margin-top: 0.8rem; /* Jarak dari nama tamu ke tombol */
+            }
+            .gallery-slides img {
+                height: 300px; /* Sesuaikan tinggi gambar galeri di mobile */
+            }
+
+            /* Gaya untuk Bottom Navigation */
+            #bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background-color: rgba(255, 255, 255, 0.95); /* Background semi-transparan */
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                padding: 0.5rem 0;
+                z-index: 101; /* Pastikan di atas konten utama */
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Efek bayangan di atas menu */
+                border-top-left-radius: 15px; /* Sedikit lengkungan di ujung atas */
+                border-top-right-radius: 15px;
+            }
+
+            #bottom-nav a {
+                color: var(--text-color);
+                text-decoration: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-size: 0.7rem; /* Ukuran font lebih kecil untuk teks */
+                flex: 1; /* Agar membagi ruang secara merata */
+                padding: 5px 0; /* Padding vertikal untuk area sentuh */
+            }
+
+            #bottom-nav a:hover {
+                color: var(--accent-color);
+            }
+
+            #bottom-nav i { /* Mengubah 'span' menjadi 'i' */
+                font-size: 1.3rem; /* Ukuran ikon di mobile */
+                margin-bottom: 0.2rem;
+            }
+
+            /* Sembunyikan bottom-nav saat cover ditampilkan */
+            /* Ini akan diatur oleh JS sekarang, jadi aturan ini bisa dihapus atau di override */
+            #bottom-nav.hidden {
+                display: none !important; /* Penting agar JS bisa mengontrolnya */
+            }
+        }
+
+        /* Sembunyikan bottom-nav di layar desktop (jika tidak diinginkan) */
+        @media (min-width: 769px) {
+            #bottom-nav {
+                display: none !important;
+            }
+        }
+
+        /* Animasi Pop-up untuk nama di Cover */
+        .cover-content h1.wedding-names {
+            font-size: 3.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .cover-content h1.wedding-names span {
+            display: inline-block;
+            transform: scale(0);
+            opacity: 0;
+            animation: popUpName 1s ease-out forwards;
+        }
+        .cover-content h1.wedding-names .name-robi {
+            animation-delay: 0.8s;
+        }
+        .cover-content h1.wedding-names .ampersand {
+            animation-delay: 1s;
+        }
+        .cover-content h1.wedding-names .name-astri {
+            animation-delay: 1.2s;
+        }
+        @keyframes popUpName {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        /* Gaya untuk Section Kutipan Quran (opsional) */
+        .quote-section {
+            padding: 3rem 2rem; /* Mungkin padding sedikit berbeda */
+            background-color: rgba(255, 255, 255, 0.8); /* Warna background lebih solid atau berbeda */
+            border-radius: var(--section-radius);
+            margin-left: var(--section-horizontal-margin);
+            margin-right: var(--section-horizontal-margin);
+            box-shadow: var(--section-box-shadow);
+            margin-bottom: 4rem;
+            
+            /* Gaya spesifik untuk teks kutipan */
+            font-family: var(--secondary-font); /* Atau font lain jika diinginkan */
+            font-style: italic;
+            font-size: 1.1rem; /* Ukuran font lebih besar */
+            line-height: 1.3;
+            max-width: 700px; /* Batasi lebar teks agar mudah dibaca */
+            margin-left: auto; /* Pusatkan secara horizontal */
+            margin-right: auto;
+        }
+
+        .quote-section .intro-text {
+            margin-bottom: 0.5rem; /* Jarak antara kutipan dan sumber */
+            font-style: italic; /* Pastikan tetap italic */
+        }
+        .quote-section .intro-text-source {
+            font-weight: 600; /* Pastikan tetap tebal */
+            font-size: 0.8rem; /* Sedikit lebih besar dari default small */
+        }
+
+        /* Jika Anda ingin gambar dekoratif muncul di atas section ini */
+        .quote-section::before {
+            content: ''; /* Konten kosong agar pseudoelemen muncul */
+            position: absolute;
+            top: -60px; /* Posisi di atas section */
+            left: 50%;
+            transform: translateX(-50%); /* Pusatkan secara horizontal */
+            width: 80px; /* Lebar gambar */
+            height: 80px; /* Tinggi gambar */
+            background-image: url('https://ik.imagekit.io/lbhnem2y6/upscalemedia-transformed%20(1).png?updatedAt=1750921168313'); /* URL gambar bunga */
+            background-size: contain; /* Sesuaikan ukuran gambar agar pas */
+            background-repeat: no-repeat;
+            z-index: 1; /* Pastikan gambar berada di atas background section */
+        }
+
+        /* Atur ulang margin untuk couple-section karena kutipan sudah keluar */
+        .couple-section .intro-text {
+            /* Hapus atau atur ulang margin yang sebelumnya di sini */
+            margin: 0; /* Atau disesuaikan jika ada teks lain di couple-section */
+        }
+        .couple-section .intro-text-source {
+            margin: 0; /* Hapus atau atur ulang margin yang sebelumnya di sini */
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="https://raw.githubusercontent.com/umnurie/Song/main/Dewa%20-%20Dua%20Sedjoli%20_%20Official%20Music%20Video%20%5BU8girfB5Syc%5D.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <div id="audio-player" class="hidden">
+        <button id="play-pause-btn">
+             <span class="play-icon">▶</span>
+             <span class="pause-icon">❚❚</span>
+        </button>
+    </div>
+
+    <div id="bottom-nav" class="hidden">
+        <a href="#cover-section-id">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <a href="#couple-section-id">
+            <i class="fa-solid fa-heart"></i>
+        </a>
+        <a href="#gallery-section-id">
+            <i class="fa-solid fa-image"></i>
+        </a>
+        <a href="#gift-section-id">
+            <i class="fa-solid fa-gift"></i>
+        </a>
+        <a href="#rsvp-section-id">
+            <i class="fa-solid fa-comment"></i>
+        </a>
+    </div>
+
+    <div id="cover" class="cover-section">
+        <div class="cover-content">
+            <h4>The Wedding Of</h4>
+            <h1 class="wedding-names">
+                <span class="name-robi">Robi</span>
+                <span class="ampersand">&</span>
+                <span class="name-astri">Astri</span>
+            </h1>
+            
+            <div class="cover-bottom-elements">
+                <p id="to-text">Kepada Yth.</p>
+                <p>Bapak/Ibu/Saudara/i</p>
+                <h3 id="guest-name">[Nama Tamu Undangan]</h3>
+                <button id="open-invitation"><i class="fas fa-envelope-open-text"></i> Buka Undangan</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main-content" class="hidden">
+
+        <header id="cover-section-id" class="hero-section fade-in-up">
+            <h4>We Are Getting Married</h4>
+            <h1>Robi & Astri</h1> <div class="main-hero-info"> <p id="wedding-day">Minggu,</p>
+                <p id="wedding-date">14 . 09 . 2025</p>
+            </div>
+            <div id="countdown" class="countdown">
+                <div><span id="days">00</span> Hari</div>
+                <div><span id="hours">00</span> Jam</div>
+                <div><span id="minutes">00</span> Menit</div>
+                <div><span id="seconds">00</span> Detik</div>
+            </div>
+        </header>
+
+        <section id="quote-section-id" class="quote-section fade-in-up">
+            <p class="intro-text">"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya diantaramu rasa kasih dan sayang."</p>
+            <p class="intro-text-source">(QS. Ar-Rum: 21)</p>
+        </section>
+
+        <section id="couple-section-id" class="couple-section fade-in-up">
+            <div class="couple-details">
+            </div>
+            <div style="margin-bottom: 2rem;">
+                <p>Kami mohon do'a & restunya atas pernikahan kami</p>
+            </div>
+            <div class="couple-details">
+                <div class="bride">
+                    <div class="couple-img-container">
+                        <img src="https://ik.imagekit.io/lbhnem2y6/1750904471094.jpg?updatedAt=1750912500703" alt="Astri" class="couple-img">
+                    </div>
+                    <h3 class="name">Astri Widya Hapsari</h3>
+                    <p class="parents">Putri dari Bapak Syamsul Rizal<br>& Ibu Tjusi Widyastuti</p>
+                </div>
+                <div class="groom">
+                    <div class="couple-img-container">
+                        <img src="https://ik.imagekit.io/lbhnem2y6/1750904503547.jpg?updatedAt=1750912502398" alt="Robi" class="couple-img">
+                    </div>
+                    <h3 class="name">Robi Ekadinto Heryanto</h3>
+                    <p class="parents">Putra dari Bapak Ralim<br>& Ibu Titi Roheni</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="event-section fade-in-up">
+            <h2>Detail Acara</h2>
+            <div style="margin-bottom: 2rem;">
+                <p>Kami bermaksud untuk mengundang saudara/(i) dalam acara pernikahan kami pada:</p>
+            </div>
+            <div class="event-cards">
+                <div class="card">
+                    <h3>Akad Nikah</h3>
+                    <p><strong>Minggu, 14 September 2025</strong></p>
+                    <p>09:00 WIB - Selesai</p>
+                    <p>Gedung Tangerang Convention Center</p>
+                    <a href="https://maps.app.goo.gl/woJX14VWXWJHWBfE7?g_st=ac" target="_blank" class="btn"><i class="fas fa-map-location-dot"></i> Lihat Peta</a>
+                </div>
+                <div class="card">
+                    <h3>Resepsi</h3>
+                    <p><strong>Minggu, 14 September 2025</strong></p>
+                    <p>11:00 - 14:00 WIB</p>
+                    <p>Gedung Tangerang Convention Center</p>
+                    <a href="https://maps.app.goo.gl/woJX14VWXWJHWBfE7?g_st=ac" target="_blank" class="btn"><i class="fas fa-map-location-dot"></i> Lihat Peta</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="gallery-section-id" class="gallery-section fade-in-up">
+            <h2>Momen Bahagia Kami</h2>
+            <div class="gallery-container">
+                <div class="gallery-slides">
+                    <img src="https://ik.imagekit.io/lbhnem2y6/DSCF1070.JPG?updatedAt=1750912527535" alt="Gallery Image 1">
+                    <img src="https://ik.imagekit.io/lbhnem2y6/DSCF1061.JPG?updatedAt=1750912522257" alt="Gallery Image 2">
+                    <img src="https://ik.imagekit.io/lbhnem2y6/DSCF1064.JPG?updatedAt=1750912519796" alt="Gallery Image 3">
+                    <img src="https://ik.imagekit.io/lbhnem2y6/DSCF1059.JPG?updatedAt=1750912520057" alt="Gallery Image 4">
+                </div>
+                <button class="slider-button prev">❮</button>
+                <button class="slider-button next">❯</button>
+                <div class="slider-dots">
+                    </div>
+            </div>
+        </section>
+
+        <section id="rsvp-section-id" class="rsvp-section fade-in-up">
+            <h2>Konfirmasi Kehadiran & Ucapan</h2>
+            <form action="https://formspree.io/f/xeokpled" method="POST">
+                <input type="text" name="Nama" placeholder="Nama Anda" required>
+                <select name="Konfirmasi" required>
+                    <option value="" disabled selected>Konfirmasi Kehadiran</option>
+                    <option value="Hadir">Hadir</option>
+                    <option value="Tidak Hadir">Tidak Hadir</option>
+                </select>
+                <textarea name="Ucapan" placeholder="Tulis ucapan dan doa Anda..." rows="5"></textarea>
+                <button type="submit" class="btn">Kirim</button>
+            </form>
+        </section>
+
+        <section id="gift-section-id" class="gift-section fade-in-up">
+            <h2>Hadiah Pernikahan</h2>
+            <p>Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Namun jika memberi adalah ungkapan tanda kasih, Anda dapat memberi kado secara cashless.</p>
+            <div class="gift-container">
+                <div class="gift-card">
+                    <p><strong>Bank Central Asia</strong></p>
+                    <p class="account-number">7235110458</p>
+                    <p>a.n Astri Widya Hapsari</p>
+                    <button class="btn-copy" data-clipboard-text="7235110458"><i class="fas fa-copy"></i> Salin No. Rekening</button>
+                </div>
+                 <div class="gift-card">
+                    <p><strong>Bank Central Asia</strong></p>
+                    <p class="account-number">6640305353</p>
+                    <p>a.n Robi Ekadinto Heryanto</p>
+                    <button class="btn-copy" data-clipboard-text="6640305353"><i class="fas fa-copy"></i> Salin No. Rekening</button>
+                </div>
+            </div>
+        </section>
+
+        <footer class="fade-in-up">
+            <p>Atas kehadiran dan doa restunya, kami ucapkan terima kasih.</p>
+            <h3>Robi & Astri</h3>
+        </footer>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- Mengambil elemen dari HTML ---
+            const cover = document.getElementById('cover');
+            const mainContent = document.getElementById('main-content');
+            const openButton = document.getElementById('open-invitation');
+            const music = document.getElementById('bg-music'); // Tag audio MP3
+            const audioPlayer = document.getElementById('audio-player'); // Kontainer tombol play/pause
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const bottomNav = document.getElementById('bottom-nav'); // Navigasi bawah
+
+            // --- Logika untuk Tombol Buka Undangan ---
+            openButton.addEventListener('click', function() {
+                cover.classList.add('fade-out'); // Mulai animasi fade-out untuk cover
+                mainContent.classList.remove('hidden'); // Tampilkan konten utama
+                bottomNav.classList.remove('hidden'); // Tampilkan bottom navigation bar
+                document.body.style.overflowY = 'auto'; // Aktifkan kembali scrollbar
+                
+                // *** PERBAIKAN MUSIK: Memutar musik HANYA setelah klik tombol ***
+                music.play().then(() => {
+                    playPauseBtn.classList.add('playing'); // Update ikon tombol ke pause jika berhasil
+                    audioPlayer.classList.remove('hidden'); // Tampilkan tombol kontrol musik
+                }).catch(error => {
+                    console.error("Musik tidak dapat diputar otomatis setelah klik tombol:", error);
+                    // Jika masih ada masalah (misal, user sebelumnya me-mute tab), tombol kontrol musik tetap muncul
+                    audioPlayer.classList.remove('hidden');
+                });
+                // ***************************************************************
+
+                // Memulai animasi fade-in untuk section-section konten
+                observeSections();
+
+                // Sembunyikan cover setelah animasi selesai
+                setTimeout(() => {
+                    cover.style.display = 'none';
+                }, 1000); // Durasi harus sama dengan transisi CSS fade-out
+            });
+
+            // --- Logika untuk Tombol Play/Pause Musik (INI SUDAH BENAR) ---
+            playPauseBtn.addEventListener('click', function() {
+                if (music.paused) {
+                    music.play();
+                    this.classList.add('playing'); // Mengubah ikon menjadi pause
+                } else {
+                    music.pause();
+                    this.classList.remove('playing'); // Mengubah ikon menjadi play
+                }
+            });
+
+            // --- Logika untuk Hitung Mundur ---
+            // Sesuaikan tanggal ini ke tanggal dan waktu pernikahan Anda
+            const countdownDate = new Date("Sep 14, 2025 09:00:00").getTime();
+            
+            const countdownFunction = setInterval(function() {
+                const now = new Date().getTime();
+                const distance = countdownDate - now;
+                
+                // Perhitungan waktu untuk hari, jam, menit, dan detik
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                // Menampilkan hasil di elemen HTML dengan format dua digit
+                document.getElementById('days').innerText = days.toString().padStart(2, '0');
+                document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').innerText = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').innerText = seconds.toString().padStart(2, '0');
+                
+                // Jika hitung mundur selesai
+                if (distance < 0) {
+                    clearInterval(countdownFunction);
+                    document.getElementById('countdown').innerHTML = "Acara Telah Dimulai!";
+                }
+            }, 1000); // Update setiap 1 detik
+
+            // --- Logika untuk Tombol Salin No. Rekening ---
+            const copyButtons = document.querySelectorAll('.btn-copy');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const textToCopy = this.getAttribute('data-clipboard-text');
+                    // Menggunakan Clipboard API modern
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        const originalText = this.innerText;
+                        this.innerHTML = '<i class="fas fa-check"></i> Berhasil Disalin!'; // Ganti ikon dan teks
+                        setTimeout(() => {
+                            this.innerHTML = '<i class="fas fa-copy"></i> ' + originalText.replace('<i class="fas fa-check"></i> ', ''); // Kembalikan ikon dan teks asli
+                        }, 2000); // Kembali ke teks asli setelah 2 detik
+                    }).catch(err => {
+                        console.error('Gagal menyalin:', err);
+                        alert('Gagal menyalin nomor rekening. Silakan salin manual.'); // Pemberitahuan jika gagal
+                    });
+                });
+            });
+
+            // --- Logika untuk Menampilkan Nama Tamu dari URL ---
+            // Contoh URL: yourdomain.com/undangan.html?to=Nama_Tamu
+            const urlParams = new URLSearchParams(window.location.search);
+            const guest = urlParams.get('to');
+            const guestNameElement = document.getElementById('guest-name');
+            if (guest) {
+                guestNameElement.innerText = guest.replace(/_/g, " "); // Mengganti underscore dengan spasi
+                // Juga isi nama di form RSVP jika ada
+                const rsvpNameInput = document.querySelector('input[name="Nama"]');
+                if (rsvpNameInput) {
+                    rsvpNameInput.value = guest.replace(/_/g, " ");
+                }
+            } else {
+                guestNameElement.innerText = "Tamu Undangan"; // Default jika tidak ada nama di URL
+            }
+
+            // --- Animasi Scroll (Intersection Observer) ---
+            function observeSections() {
+                const sections = document.querySelectorAll('.fade-in-up');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                        }
+                    });
+                }, { threshold: 0.1 }); // Muncul saat 10% section terlihat
+                
+                sections.forEach(section => {
+                    observer.observe(section);
+                });
+            }
+
+            // --- Logika Slideshow Galeri ---
+            const gallerySlides = document.querySelector('.gallery-slides');
+            const images = document.querySelectorAll('.gallery-slides img');
+            const prevButton = document.querySelector('.slider-button.prev');
+            const nextButton = document.querySelector('.slider-button.next');
+            const dotsContainer = document.querySelector('.slider-dots');
+            let currentIndex = 0;
+
+            // Fungsi untuk menampilkan slide
+            function showSlide(index) {
+                if (index >= images.length) {
+                    currentIndex = 0;
+                } else if (index < 0) {
+                    currentIndex = images.length - 1;
+                } else {
+                    currentIndex = index;
+                }
+                const offset = -currentIndex * 100;
+                gallerySlides.style.transform = `translateX(${offset}%)`;
+                updateDots();
+            }
+
+            // Fungsi untuk memperbarui indikator titik
+            function updateDots() {
+                dotsContainer.innerHTML = ''; // Bersihkan dots yang ada
+                for (let i = 0; i < images.length; i++) {
+                    const dot = document.createElement('span');
+                    dot.classList.add('dot');
+                    if (i === currentIndex) {
+                        dot.classList.add('active');
+                    }
+                    dot.addEventListener('click', () => showSlide(i));
+                    dotsContainer.appendChild(dot);
+                }
+            }
+
+            // Event listener untuk tombol navigasi
+            prevButton.addEventListener('click', () => showSlide(currentIndex - 1));
+            nextButton.addEventListener('click', () => showSlide(currentIndex + 1));
+
+            // Inisialisasi slideshow saat halaman dimuat
+            showSlide(0);
+
+            // Optional: Auto-slide
+            // setInterval(() => {
+            //     showSlide(currentIndex + 1);
+            // }, 5000); // Ganti gambar setiap 5 detik
+        });
+    </script>
+</body>
+</html>
