@@ -815,15 +815,16 @@
 
         <section id="rsvp-section-id" class="rsvp-section fade-in-up">
             <h2>Konfirmasi Kehadiran & Ucapan</h2>
-            <form action="https://formspree.io/f/xeokpled" method="POST">
-                <input type="text" name="Nama" placeholder="Nama Anda" required>
-                <select name="Konfirmasi" required>
-                    <option value="" disabled selected>Konfirmasi Kehadiran</option>
+            <form action="https://staticman-app.herokuapp.com/v3/entry/umnurie/undangan/main/comments" method="POST" id="guestbook-form">
+                <input name="options[redirect]" type="hidden" value="https://undangan-astri-robi.netlify.app/">
+                <input name="options[slug]" type="hidden" value="ucapan-dari-tamu"> <input name="options[origin]" type="hidden" value="https://undangan-astri-robi.netlify.app/">
+
+                <input type="text" name="fields[name]" placeholder="Nama Anda" required>
+                <select name="fields[konfirmasi]" required> <option value="" disabled selected>Konfirmasi Kehadiran</option>
                     <option value="Hadir">Hadir</option>
                     <option value="Tidak Hadir">Tidak Hadir</option>
                 </select>
-                <textarea name="Ucapan" placeholder="Tulis ucapan dan doa Anda..." rows="5"></textarea>
-                <button type="submit" class="btn">Kirim</button>
+                <textarea name="fields[message]" placeholder="Tulis ucapan dan doa Anda..." rows="5"></textarea> <button type="submit" class="btn">Kirim</button>
             </form>
         </section>
 
@@ -1027,6 +1028,130 @@
             // setInterval(() => {
             //     showSlide(currentIndex + 1);
             // }, 5000); // Ganti gambar setiap 5 detik
+        
+            // --- Bagian untuk menampilkan Ucapan ---
+            const guestbookEntriesContainer = document.getElementById('guestbook-entries');
+            const repoOwner = 'umnurie'; // Ganti dengan username GitHub Anda
+            const repoName = 'undangan'; // Ganti dengan nama repositori Anda
+            const branchName = 'main'; // Ganti dengan branch utama Anda (misal: 'main' atau 'master')
+            const dataPath = '_data/guestbook'; // Sesuai dengan `path` di staticman.yml
+
+            async function loadGuestbookEntries() {
+                try {
+                    // URL untuk mendapatkan daftar file di folder guestbook
+                    // GitHub API membutuhkan header Accept untuk JSON
+                    const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${dataPath}?ref=${branchName}`;
+                    const response = await fetch(url, {
+                        headers: {
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                             guestbookEntriesContainer.innerHTML = '<p style="text-align: center;">Belum ada ucapan. Jadilah yang pertama!</p>';
+                             return;
+                        }
+                        throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+                    }
+
+                    const files = await response.json();
+                    
+                    // Filter hanya file JSON (atau YML jika Anda memilih format itu)
+                    const ucapanFiles = files.filter(file => file.name.endsWith('.json'));
+
+                    if (ucapanFiles.length === 0) {
+                        guestbookEntriesContainer.innerHTML = '<p style="text-align: center;">Belum ada ucapan. Jadilah yang pertama!</p>';
+                        return;
+                    }
+
+                    // Ambil konten dari setiap file ucapan
+                    const ucapanPromises = ucapanFiles.map(async file => {
+                        const fileContentUrl = file.download_url; // URL untuk langsung mendownload konten file
+                        const fileResponse = await fetch(fileContentUrl);
+                        return fileResponse.json();
+                    });
+
+                    let allUcapan = await Promise.all(ucapanPromises);
+
+                    // Sortir ucapan berdasarkan timestamp (terbaru di atas)
+                    // Staticman menyimpan timestamp sebagai string ISO, bisa langsung diurutkan
+                    allUcapan.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+
+                    guestbookEntriesContainer.innerHTML = ''; // Kosongkan container sebelum mengisi
+
+                    allUcapan.forEach(entry => {
+                        const ucapanItem = document.createElement('div');
+                        ucapanItem.classList.add('ucapan-item');
+
+                        const ucapanHeader = document.createElement('p');
+                        ucapanHeader.classList.add('ucapan-header');
+
+                        const sender = document.createElement('span');
+                        sender.classList.add('ucapan-sender');
+                        // Pastikan nama field sesuai dengan yang Anda set di staticman.yml dan form
+                        sender.textContent = entry.name || 'Anonim'; // Default jika nama tidak ada
+
+                        const dateSpan = document.createElement('span');
+                        dateSpan.classList.add('ucapan-date');
+                        // Format tanggal dan waktu
+                        // Staticman menambahkan 'date' dan 'timestamp' secara default.
+                        // 'timestamp' lebih akurat untuk waktu lengkap.
+                        if (entry.timestamp) {
+                            const dateObj = new Date(entry.timestamp);
+                            // Format ke "Rabu, 11 Juni 2025 18:25:32"
+                            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZoneName: 'short' };
+                            dateSpan.textContent = dateObj.toLocaleDateString('id-ID', options);
+                        } else if (entry.date) { // Fallback jika hanya 'date' ada
+                             dateSpan.textContent = entry.date;
+                        } else {
+                            dateSpan.textContent = 'Tanggal tidak diketahui';
+                        }
+                       
+
+                        const message = document.createElement('p');
+                        message.classList.add('ucapan-message');
+                        // Pastikan nama field sesuai dengan yang Anda set di staticman.yml dan form
+                        message.textContent = entry.message || 'Tidak ada pesan.'; // Default jika pesan tidak ada
+
+                        ucapanHeader.appendChild(sender);
+                        ucapanHeader.appendChild(dateSpan);
+                        
+                        ucapanItem.appendChild(ucapanHeader);
+                        ucapanItem.appendChild(message);
+                        guestbookEntriesContainer.appendChild(ucapanItem);
+                    });
+
+                } catch (error) {
+                    console.error('Gagal memuat ucapan:', error);
+                    guestbookEntriesContainer.innerHTML = '<p style="text-align: center; color: red;">Gagal memuat ucapan. Silakan periksa konsol browser untuk detail error.</p>';
+                }
+            }
+
+            // Panggil fungsi saat halaman dimuat
+            loadGuestbookEntries();
+
+            // Opsional: Muat ulang ucapan setelah formulir dikirim
+            // Jika Anda ingin ucapan muncul secara instan setelah dikirim tanpa refresh halaman,
+            // Anda perlu menangani pengiriman formulir dengan AJAX/Fetch di JavaScript Anda
+            // dan kemudian memanggil loadGuestbookEntries() lagi.
+            // Contoh sederhana (ini tidak akan berfungsi dengan formspree action di form):
+            const guestbookForm = document.getElementById('guestbook-form');
+            if(guestbookForm) {
+                guestbookForm.addEventListener('submit', async function(event) {
+                    // Staticman akan me-redirect secara otomatis, jadi ini mungkin tidak diperlukan
+                    // kecuali Anda ingin menonaktifkan redirect default Staticman (dengan JS)
+                    // dan menangani pengiriman sendiri.
+                    // Untuk Staticman, biasanya redirect setelah kirim adalah cara termudah.
+                    // Jika Anda ingin update instan tanpa redirect, Anda perlu
+                    // mencegah redirect default Staticman dan mengirimkan data secara AJAX,
+                    // kemudian memanggil loadGuestbookEntries() setelahnya.
+                    // Ini sedikit lebih kompleks dari lingkup ini.
+                    // Saat ini, setelah kirim, halaman akan di-refresh atau di-redirect,
+                    // dan ucapan akan otomatis termuat.
+                });
+            }
         });
     </script>
 </body>
