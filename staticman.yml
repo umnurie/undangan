@@ -1,0 +1,68 @@
+# staticman.yml
+
+# Konfigurasi untuk grup komentar/guestbook Anda
+comments:
+    # URL repositori Anda (ganti dengan username dan nama repo Anda)
+    repository: 'NAMA_USERNAME_GITHUB_ANDA/NAMA_REPOSITORI_ANDA'
+    # Nama branch tempat file akan disimpan
+    branch: 'main' # Atau 'master' jika itu branch utama Anda
+
+    # Jalur di mana file ucapan akan disimpan
+    path: '_data/guestbook' # Staticman akan membuat folder _data/guestbook
+    
+    # Format nama file untuk setiap ucapan. Gunakan timestamp untuk keunikan.
+    filename: '{@timestamp}'
+
+    # Format data file. `yaml` atau `json`
+    format: 'json'
+
+    # Bidang yang diizinkan dari formulir Anda. Pastikan sesuai dengan 'name' di input HTML
+    # `Nama` dan `Ucapan` adalah yang Anda miliki saat ini. Kita akan tambahkan `Waktu`
+    required:
+        - name
+        - message
+    
+    # Default fields that will be added to each entry
+    # Tambahkan bidang `timestamp` untuk menyimpan waktu pengiriman
+    # `options.timestampFormat` mengatur format waktu yang disimpan
+    # `options.slug` akan membuat nama file berdasarkan nama pengirim (opsional)
+    # `options.hidden` mengatur apakah entri perlu moderasi (true = disembunyikan sampai manual publish)
+    # `options.transforms` memungkinkan Anda membersihkan data (misal, hapus tag HTML)
+
+    fields:
+        name:
+            type: string
+            required: true
+        message:
+            type: string
+            required: true
+        # Kita akan tambahkan bidang untuk menyimpan waktu pengiriman
+        # Staticman secara otomatis menambahkan 'timestamp' jika tidak ada,
+        # tapi lebih baik didefinisikan untuk kontrol format.
+        # Atau kita bisa membiarkannya saja karena Staticman akan menambahkannya secara default.
+        # Untuk kasus ini, kita akan biarkan Staticman menambahkan timestamp default.
+
+    # Opsi lain (opsional)
+    options:
+        # Jika Anda ingin ucapan dimoderasi sebelum muncul di situs
+        # Set ke 'true' untuk membutuhkan persetujuan manual (merge PR)
+        # Set ke 'false' agar langsung muncul
+        # Untuk kemudahan, kita set ke false dulu. Jika mau moderasi, ganti ke true.
+        # Untuk keperluan guestbook sederhana, false mungkin lebih praktis.
+        # Perlu diingat, jika true, Staticman akan membuat Pull Request yang perlu Anda merge.
+        # Ini akan membutuhkan proses build di hosting Anda setiap kali ada PR di-merge.
+        # Untuk situs undangan sederhana, false lebih mudah.
+        # Tapi hati-hati dengan spam jika tidak ada moderasi.
+        # Misalnya, Anda bisa menambahkan Honey Pot untuk mitigasi spam (lebih advanced).
+        # Saya akan set ke false dulu untuk kemudahan.
+        # Jika Anda set ke true, Staticman akan membuat PR di repo Anda, dan Anda harus merge PR tersebut
+        # agar ucapan muncul di website. Ini adalah fitur moderasi.
+        # Kalau set ke false, ucapan akan langsung masuk ke branch utama (main/master).
+        # Untuk tujuan demo, kita pakai false dulu.
+        moderation: false
+
+    # Untuk keamanan: Hapus komentar ini jika Anda ingin menggunakan reCAPTCHA
+    # reCaptcha:
+    #   enabled: true
+    #   siteKey: 'YOUR_RECAPTCHA_SITE_KEY'
+    #   secret: 'YOUR_RECAPTCHA_SECRET_KEY'
