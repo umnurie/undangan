@@ -3,7 +3,7 @@
 # Konfigurasi untuk grup komentar/guestbook Anda
 comments:
     # URL repositori Anda (ganti dengan username dan nama repo Anda)
-    repository: 'NAMA_USERNAME_GITHUB_ANDA/NAMA_REPOSITORI_ANDA'
+    repository: 'umnurie/undangan'
     # Nama branch tempat file akan disimpan
     branch: 'main' # Atau 'master' jika itu branch utama Anda
 
