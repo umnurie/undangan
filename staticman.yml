@@ -21,6 +21,7 @@ comments:
     required:
         - name
         - message
+        - konfirmasi 
     
     # Default fields that will be added to each entry
     # Tambahkan bidang `timestamp` untuk menyimpan waktu pengiriman
@@ -34,6 +35,9 @@ comments:
             type: string
             required: true
         message:
+            type: string
+            required: true
+        konfirmasi:
             type: string
             required: true
         # Kita akan tambahkan bidang untuk menyimpan waktu pengiriman
