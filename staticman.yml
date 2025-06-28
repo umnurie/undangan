@@ -40,6 +40,7 @@ comments:
         konfirmasi:
             type: string
             required: true
+            
         # Kita akan tambahkan bidang untuk menyimpan waktu pengiriman
         # Staticman secara otomatis menambahkan 'timestamp' jika tidak ada,
         # tapi lebih baik didefinisikan untuk kontrol format.
