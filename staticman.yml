@@ -1,0 +1,15 @@
+name: "Undangan Robi & Astri"
+path: "_data/guestbook"
+allowedFields: ["name", "konfirmasi", "message"]
+requiredFields: ["name", "konfirmasi"]
+branch: "main"
+format: "json"
+generatedFields:
+  date:
+    type: date
+    options:
+      format: "iso8601"
+  timestamp:
+    type: date
+    options:
+      format: "timestamp-seconds"
