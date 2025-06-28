@@ -1,73 +1,36 @@
-# staticman.yml
+# staticman.yml di root repositori umnurie/undangan Anda
 
-# Konfigurasi untuk grup komentar/guestbook Anda
-comments:
-    # URL repositori Anda (ganti dengan username dan nama repo Anda)
-    repository: 'umnurie/undangan'
-    # Nama branch tempat file akan disimpan
-    branch: 'main' # Atau 'master' jika itu branch utama Anda
+# Nama ini (ucapan-dari-tamu) HARUS sama persis dengan
+# nilai di input options[slug] di form HTML Anda:
+# <input name="options[slug]" type="hidden" value="ucapan-dari-tamu">
+ucapan-dari-tamu: 
+    # Bidang-bidang yang diizinkan untuk dikirimkan melalui formulir.
+    # HARUS sama persis dengan 'name="fields[nama_field]"' di HTML Anda.
+    allowedFields: ['name', 'konfirmasi', 'message']
 
-    # Jalur di mana file ucapan akan disimpan
-    path: '_data/guestbook' # Staticman akan membuat folder _data/guestbook
-    
-    # Format nama file untuk setiap ucapan. Gunakan timestamp untuk keunikan.
-    filename: '{@timestamp}'
+    # Bidang-bidang yang wajib diisi. Jika kosong, Staticman akan menolak kiriman.
+    requiredFields: ['name', 'konfirmasi', 'message']
 
-    # Format data file. `yaml` atau `json`
+    # Jika 'true', Staticman akan membuat Pull Request (PR) untuk setiap kiriman.
+    # Anda harus me-merge PR tersebut agar data muncul di situs.
+    # Jika 'false', data akan langsung dikomit ke branch utama.
+    moderation: true 
+
+    # Format file data yang akan disimpan (json, yaml, atau frontmatter).
+    # JSON adalah pilihan umum.
     format: 'json'
 
-    # Bidang yang diizinkan dari formulir Anda. Pastikan sesuai dengan 'name' di input HTML
-    # `Nama` dan `Ucapan` adalah yang Anda miliki saat ini. Kita akan tambahkan `Waktu`
-    required:
-        - name
-        - message
-        - konfirmasi 
-    
-    # Default fields that will be added to each entry
-    # Tambahkan bidang `timestamp` untuk menyimpan waktu pengiriman
-    # `options.timestampFormat` mengatur format waktu yang disimpan
-    # `options.slug` akan membuat nama file berdasarkan nama pengirim (opsional)
-    # `options.hidden` mengatur apakah entri perlu moderasi (true = disembunyikan sampai manual publish)
-    # `options.transforms` memungkinkan Anda membersihkan data (misal, hapus tag HTML)
+    # Path atau jalur folder tempat Staticman akan menyimpan file-file ucapan.
+    # Ini harus sesuai dengan lokasi yang diakses oleh JavaScript Anda.
+    path: '_data/guestbook'
 
-    fields:
-        name:
-            type: string
-            required: true
-        message:
-            type: string
-            required: true
-        konfirmasi:
-            type: string
-            required: true
-            
-        # Kita akan tambahkan bidang untuk menyimpan waktu pengiriman
-        # Staticman secara otomatis menambahkan 'timestamp' jika tidak ada,
-        # tapi lebih baik didefinisikan untuk kontrol format.
-        # Atau kita bisa membiarkannya saja karena Staticman akan menambahkannya secara default.
-        # Untuk kasus ini, kita akan biarkan Staticman menambahkan timestamp default.
+    # Template untuk nama file yang akan dibuat. {{timestamp}} akan menghasilkan nama unik berdasarkan waktu.
+    filename: '{{timestamp}}'
 
-    # Opsi lain (opsional)
-    options:
-        # Jika Anda ingin ucapan dimoderasi sebelum muncul di situs
-        # Set ke 'true' untuk membutuhkan persetujuan manual (merge PR)
-        # Set ke 'false' agar langsung muncul
-        # Untuk kemudahan, kita set ke false dulu. Jika mau moderasi, ganti ke true.
-        # Untuk keperluan guestbook sederhana, false mungkin lebih praktis.
-        # Perlu diingat, jika true, Staticman akan membuat Pull Request yang perlu Anda merge.
-        # Ini akan membutuhkan proses build di hosting Anda setiap kali ada PR di-merge.
-        # Untuk situs undangan sederhana, false lebih mudah.
-        # Tapi hati-hati dengan spam jika tidak ada moderasi.
-        # Misalnya, Anda bisa menambahkan Honey Pot untuk mitigasi spam (lebih advanced).
-        # Saya akan set ke false dulu untuk kemudahan.
-        # Jika Anda set ke true, Staticman akan membuat PR di repo Anda, dan Anda harus merge PR tersebut
-        # agar ucapan muncul di website. Ini adalah fitur moderasi.
-        # Kalau set ke false, ucapan akan langsung masuk ke branch utama (main/master).
-        # Untuk tujuan demo, kita pakai false dulu.
-        moderation: false
+    # Pesan commit yang akan digunakan saat Staticman membuat commit atau PR.
+    commitMessage: 'New guestbook entry by {fields.name}'
 
-    # Untuk keamanan: Hapus komentar ini jika Anda ingin menggunakan reCAPTCHA
-    # reCaptcha:
-    #   enabled: true
-    #   siteKey: 'YOUR_RECAPTCHA_SITE_KEY'
-    #   secret: 'YOUR_RECAPTCHA_SECRET_KEY'
+    # Optional: Pengaturan notifikasi (misalnya, ke Slack atau email)
+    # notifications:
+    #   type: 'slack' # atau 'email'
+    #   url: 'YOUR_WEBHOOK_URL' # Ganti dengan webhook URL Anda
