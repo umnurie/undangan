@@ -64,7 +64,7 @@
             background-color: rgba(255, 255, 255, 0.7); /* Background putih transparan */
             margin-bottom: 4rem; /* Jarak antar section */
             border-radius: var(--section-radius); /* Sudut membulat */
-            position: center; /* Diperlukan untuk penempatan gambar di atas section */
+            position: relative; /* Diperlukan untuk penempatan gambar di atas section */
             margin-left: var(--section-horizontal-margin); /* Margin kiri untuk efek mengambang */
             margin-right: var(--section-horizontal-margin); /* Margin kanan untuk efek mengambang */
             box-shadow: var(--section-box-shadow); /* Efek shadow */
@@ -679,7 +679,47 @@
         .couple-section .intro-text-source {
             margin: 0; /* Hapus atau atur ulang margin yang sebelumnya di sini */
         }
+
+        /* Gaya untuk item ucapan */
+        .greeting-item {
+            background-color: var(--white-color);
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .greeting-item .sender-name {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.3rem;
+            display: block; /* Agar nama di baris sendiri */
+        }
+
+        .greeting-item .attendance-status {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+            display: block; /* Agar status di baris sendiri */
+        }
+
+        .greeting-item .message-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        .greetings-list-area {
+            margin-top: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -835,24 +875,20 @@
 
         <section id="rsvp-section-id" class="rsvp-section fade-in-up">
             <h2>Konfirmasi Kehadiran & Ucapan</h2>
-            <form action="https://staticman-app.herokuapp.com/v3/entry/github/umnurie/undangan/main" method="POST" id="guestbook-form">
-                <input name="options[redirect]" type="hidden" value="https://robi-astri-invitation.netlify.app/">
-                <input name="options[slug]" type="hidden" value="ucapan-dari-tamu">
-                <input name="options[origin]" type="hidden" value="https://robi-astri-invitation.netlify.app/">
-
-                <input type="text" name="fields[name]" placeholder="Nama Anda" required>
-                <select name="fields[konfirmasi]" required>
+            <form id="greeting-form">
+                <input type="text" id="sender-name" placeholder="Nama Anda" required>
+                <select id="attendance-status" required>
                     <option value="" disabled selected>Konfirmasi Kehadiran</option>
                     <option value="Hadir">Hadir</option>
                     <option value="Tidak Hadir">Tidak Hadir</option>
                 </select>
-                <textarea name="fields[message]" placeholder="Tulis ucapan dan doa Anda..." rows="5"></textarea>
+                <textarea id="message-text" placeholder="Tulis ucapan dan doa Anda..." rows="5"></textarea>
                 <button type="submit" class="btn">Kirim</button>
             </form>
 
-            <div class="ucapan-display-area">
+            <div class="greetings-list-area">
                 <h3>Ucapan & Doa</h3>
-                <div id="guestbook-entries">
+                <div id="greetings-list">
                     <p style="text-align: center; color: var(--accent-color);">Memuat ucapan...</p>
                 </div>
             </div>
@@ -865,116 +901,202 @@
     </main>
     
     <script>
+        // Supabase Configuration
+        // PASTIKAN SUPABASE_URL DAN SUPABASE_ANON_KEY SUDAH BENAR SESUAI DENGAN AKUN ANDA
+        const SUPABASE_URL = 'https://wzzgrzzkfqwmjdiqwpvl.supabase.co'; //
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6emdyenprZnF3bWpkaXF3cHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTExMjYyNTAsImV4cCI6MjA2NjcwMjI1MH0.oojHFe72kVU_rDIcVG_g-3YT5xXktvCUpN4FR8K9Ik'; //
+
+        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Function to submit a new greeting
+        async function submitGreeting(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const senderName = document.getElementById('sender-name').value;
+            const attendanceStatus = document.getElementById('attendance-status').value;
+            const messageText = document.getElementById('message-text').value;
+
+            if (!senderName || !attendanceStatus || !messageText) {
+                alert('Harap lengkapi semua kolom formulir.');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('greetings') // Pastikan nama tabel ini sesuai dengan yang Anda buat di Supabase
+                    .insert([
+                        { 
+                            sender_name: senderName, 
+                            attendance_status: attendanceStatus, 
+                            message: messageText 
+                        }
+                    ]);
+
+                if (error) {
+                    throw error;
+                }
+
+                alert('Ucapan dan konfirmasi kehadiran berhasil dikirim!');
+                document.getElementById('greeting-form').reset(); // Clear form
+                loadGreetings(); // Reload greetings to show the new one
+            } catch (error) {
+                console.error('Error submitting greeting:', error.message);
+                alert('Gagal mengirim ucapan: ' + error.message);
+            }
+        }
+
+        // Function to load greetings
+        async function loadGreetings() {
+            const greetingsList = document.getElementById('greetings-list');
+            greetingsList.innerHTML = '<p style="text-align: center; color: var(--accent-color);">Memuat ucapan...</p>'; // Show loading message
+
+            try {
+                const { data: greetings, error } = await supabase
+                    .from('greetings') // Pastikan nama tabel ini sesuai
+                    .select('*')
+                    .order('created_at', { ascending: false }); // Urutkan dari terbaru
+
+                if (error) {
+                    throw error;
+                }
+
+                if (greetings.length === 0) {
+                    greetingsList.innerHTML = '<p style="text-align: center; color: var(--accent-color);">Belum ada ucapan. Jadilah yang pertama!</p>';
+                    return;
+                }
+
+                greetingsList.innerHTML = ''; // Clear loading message
+
+                greetings.forEach(greeting => {
+                    const greetingItem = document.createElement('div');
+                    greetingItem.classList.add('greeting-item');
+
+                    const senderNameEl = document.createElement('span');
+                    senderNameEl.classList.add('sender-name');
+                    senderNameEl.textContent = greeting.sender_name;
+
+                    const attendanceStatusEl = document.createElement('span');
+                    attendanceStatusEl.classList.add('attendance-status');
+                    attendanceStatusEl.textContent = `Konfirmasi: ${greeting.attendance_status}`;
+
+                    const messageTextEl = document.createElement('p');
+                    messageTextEl.classList.add('message-text');
+                    messageTextEl.textContent = greeting.message;
+
+                    greetingItem.appendChild(senderNameEl);
+                    greetingItem.appendChild(attendanceStatusEl);
+                    greetingItem.appendChild(messageTextEl);
+                    greetingsList.appendChild(greetingItem);
+                });
+
+            } catch (error) {
+                console.error('Error loading greetings:', error.message);
+                greetingsList.innerHTML = '<p style="text-align: center; color: red;">Gagal memuat ucapan. Silakan periksa konsol browser untuk detail error.</p>';
+            }
+        }
+
+        // Function to get and set guest name from URL
+        function getAndSetInvitedGuestName() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const guest = urlParams.get('to');
+            const guestNameElement = document.getElementById('guest-name');
+            const rsvpNameInput = document.getElementById('sender-name'); 
+
+            if (guest) {
+                guestNameElement.innerText = guest.replace(/_/g, " "); 
+                if (rsvpNameInput) {
+                    rsvpNameInput.value = guest.replace(/_/g, " ");
+                }
+            } else {
+                guestNameElement.innerText = "Tamu Undangan"; 
+            }
+        }
+
+
         document.addEventListener('DOMContentLoaded', function() {
             
             // --- Mengambil elemen dari HTML ---
             const cover = document.getElementById('cover');
             const mainContent = document.getElementById('main-content');
             const openButton = document.getElementById('open-invitation');
-            const music = document.getElementById('bg-music'); // Tag audio MP3
-            const audioPlayer = document.getElementById('audio-player'); // Kontainer tombol play/pause
+            const music = document.getElementById('bg-music'); 
+            const audioPlayer = document.getElementById('audio-player'); 
             const playPauseBtn = document.getElementById('play-pause-btn');
-            const bottomNav = document.getElementById('bottom-nav'); // Navigasi bawah
+            const bottomNav = document.getElementById('bottom-nav'); 
 
             // --- Logika untuk Tombol Buka Undangan ---
             openButton.addEventListener('click', function() {
-                cover.classList.add('fade-out'); // Mulai animasi fade-out untuk cover
-                mainContent.classList.remove('hidden'); // Tampilkan konten utama
-                bottomNav.classList.remove('hidden'); // Tampilkan bottom navigation bar
-                document.body.style.overflowY = 'auto'; // Aktifkan kembali scrollbar
+                cover.classList.add('fade-out'); 
+                mainContent.classList.remove('hidden'); 
+                bottomNav.classList.remove('hidden'); 
+                document.body.style.overflowY = 'auto'; 
                 
-                // *** PERBAIKAN MUSIK: Memutar musik HANYA setelah klik tombol ***
                 music.play().then(() => {
-                    playPauseBtn.classList.add('playing'); // Update ikon tombol ke pause jika berhasil
-                    audioPlayer.classList.remove('hidden'); // Tampilkan tombol kontrol musik
+                    playPauseBtn.classList.add('playing'); 
+                    audioPlayer.classList.remove('hidden'); 
                 }).catch(error => {
                     console.error("Musik tidak dapat diputar otomatis setelah klik tombol:", error);
-                    // Jika masih ada masalah (misal, user sebelumnya me-mute tab), tombol kontrol musik tetap muncul
                     audioPlayer.classList.remove('hidden');
                 });
-                // ***************************************************************
 
-                // Memulai animasi fade-in untuk section-section konten
                 observeSections();
 
-                // Sembunyikan cover setelah animasi selesai
                 setTimeout(() => {
                     cover.style.display = 'none';
-                }, 1000); // Durasi harus sama dengan transisi CSS fade-out
+                }, 1000); 
             });
 
-            // --- Logika untuk Tombol Play/Pause Musik (INI SUDAH BENAR) ---
+            // --- Logika untuk Tombol Play/Pause Musik ---
             playPauseBtn.addEventListener('click', function() {
                 if (music.paused) {
                     music.play();
-                    this.classList.add('playing'); // Mengubah ikon menjadi pause
+                    this.classList.add('playing'); 
                 } else {
                     music.pause();
-                    this.classList.remove('playing'); // Mengubah ikon menjadi play
+                    this.classList.remove('playing'); 
                 }
             });
 
             // --- Logika untuk Hitung Mundur ---
-            // Sesuaikan tanggal ini ke tanggal dan waktu pernikahan Anda
             const countdownDate = new Date("Sep 14, 2025 09:00:00").getTime();
             
             const countdownFunction = setInterval(function() {
                 const now = new Date().getTime();
                 const distance = countdownDate - now;
                 
-                // Perhitungan waktu untuk hari, jam, menit, dan detik
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
                 
-                // Menampilkan hasil di elemen HTML dengan format dua digit
                 document.getElementById('days').innerText = days.toString().padStart(2, '0');
                 document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
                 document.getElementById('minutes').innerText = minutes.toString().padStart(2, '0');
                 document.getElementById('seconds').innerText = seconds.toString().padStart(2, '0');
                 
-                // Jika hitung mundur selesai
                 if (distance < 0) {
                     clearInterval(countdownFunction);
                     document.getElementById('countdown').innerHTML = "Acara Telah Dimulai!";
                 }
-            }, 1000); // Update setiap 1 detik
+            }, 1000); 
 
             // --- Logika untuk Tombol Salin No. Rekening ---
             const copyButtons = document.querySelectorAll('.btn-copy');
             copyButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const textToCopy = this.getAttribute('data-clipboard-text');
-                    // Menggunakan Clipboard API modern
                     navigator.clipboard.writeText(textToCopy).then(() => {
                         const originalText = this.innerText;
-                        this.innerHTML = '<i class="fas fa-check"></i> Berhasil Disalin!'; // Ganti ikon dan teks
+                        this.innerHTML = '<i class="fas fa-check"></i> Berhasil Disalin!'; 
                         setTimeout(() => {
-                            this.innerHTML = '<i class="fas fa-copy"></i> ' + originalText.replace('<i class="fas fa-check"></i> ', ''); // Kembalikan ikon dan teks asli
-                        }, 2000); // Kembali ke teks asli setelah 2 detik
+                            this.innerHTML = '<i class="fas fa-copy"></i> ' + originalText.replace('<i class="fas fa-check"></i> ', ''); 
+                        }, 2000); 
                     }).catch(err => {
                         console.error('Gagal menyalin:', err);
-                        alert('Gagal menyalin nomor rekening. Silakan salin manual.'); // Pemberitahuan jika gagal
+                        alert('Gagal menyalin nomor rekening. Silakan salin manual.'); 
                     });
                 });
             });
-
-            // --- Logika untuk Menampilkan Nama Tamu dari URL ---
-            // Contoh URL: yourdomain.com/undangan.html?to=Nama_Tamu
-            const urlParams = new URLSearchParams(window.location.search);
-            const guest = urlParams.get('to');
-            const guestNameElement = document.getElementById('guest-name');
-            if (guest) {
-                guestNameElement.innerText = guest.replace(/_/g, " "); // Mengganti underscore dengan spasi
-                // Juga isi nama di form RSVP jika ada
-                const rsvpNameInput = document.querySelector('input[name="fields[name]"]'); // PERBAIKAN DI SINI
-                if (rsvpNameInput) {
-                    rsvpNameInput.value = guest.replace(/_/g, " ");
-                }
-            } else {
-                guestNameElement.innerText = "Tamu Undangan"; // Default jika tidak ada nama di URL
-            }
 
             // --- Animasi Scroll (Intersection Observer) ---
             function observeSections() {
@@ -985,7 +1107,7 @@
                             entry.target.classList.add('visible');
                         }
                     });
-                }, { threshold: 0.1 }); // Muncul saat 10% section terlihat
+                }, { threshold: 0.1 }); 
                 
                 sections.forEach(section => {
                     observer.observe(section);
@@ -1000,7 +1122,6 @@
             const dotsContainer = document.querySelector('.slider-dots');
             let currentIndex = 0;
 
-            // Fungsi untuk menampilkan slide
             function showSlide(index) {
                 if (index >= images.length) {
                     currentIndex = 0;
@@ -1014,9 +1135,8 @@
                 updateDots();
             }
 
-            // Fungsi untuk memperbarui indikator titik
             function updateDots() {
-                dotsContainer.innerHTML = ''; // Bersihkan dots yang ada
+                dotsContainer.innerHTML = ''; 
                 for (let i = 0; i < images.length; i++) {
                     const dot = document.createElement('span');
                     dot.classList.add('dot');
@@ -1028,141 +1148,16 @@
                 }
             }
 
-            // Event listener untuk tombol navigasi
             prevButton.addEventListener('click', () => showSlide(currentIndex - 1));
             nextButton.addEventListener('click', () => showSlide(currentIndex + 1));
 
-            // Inisialisasi slideshow saat halaman dimuat
             showSlide(0);
 
-            // Optional: Auto-slide
-            // setInterval(() => {
-            //     showSlide(currentIndex + 1);
-            // }, 5000); // Ganti gambar setiap 5 detik
-        
-            // --- Bagian untuk menampilkan Ucapan ---
-            const guestbookEntriesContainer = document.getElementById('guestbook-entries');
-            const repoOwner = 'umnurie'; // Ganti dengan username GitHub Anda
-            const repoName = 'undangan'; // Ganti dengan nama repositori Anda
-            const branchName = 'main'; // Ganti dengan branch utama Anda (misal: 'main' atau 'master')
-            const dataPath = '_data/guestbook'; // Sesuai dengan `path` di staticman.yml
-
-            async function loadGuestbookEntries() {
-                try {
-                    // URL untuk mendapatkan daftar file di folder guestbook
-                    // GitHub API membutuhkan header Accept untuk JSON
-                    const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${dataPath}?ref=${branchName}`;
-                    const response = await fetch(url, {
-                        headers: {
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
-                    });
-
-                    if (!response.ok) {
-                        if (response.status === 404) {
-                             guestbookEntriesContainer.innerHTML = '<p style="text-align: center;">Belum ada ucapan. Jadilah yang pertama!</p>';
-                             return;
-                        }
-                        throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
-                    }
-
-                    const files = await response.json();
-                    
-                    // Filter hanya file JSON (atau YML jika Anda memilih format itu)
-                    const ucapanFiles = files.filter(file => file.name.endsWith('.json'));
-
-                    if (ucapanFiles.length === 0) {
-                        guestbookEntriesContainer.innerHTML = '<p style="text-align: center;">Belum ada ucapan. Jadilah yang pertama!</p>';
-                        return;
-                    }
-
-                    // Ambil konten dari setiap file ucapan
-                    const ucapanPromises = ucapanFiles.map(async file => {
-                        const fileContentUrl = file.download_url; // URL untuk langsung mendownload konten file
-                        const fileResponse = await fetch(fileContentUrl);
-                        return fileResponse.json();
-                    });
-
-                    let allUcapan = await Promise.all(ucapanPromises);
-
-                    // Sortir ucapan berdasarkan timestamp (terbaru di atas)
-                    // Staticman menyimpan timestamp sebagai string ISO, bisa langsung diurutkan
-                    allUcapan.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-
-                    guestbookEntriesContainer.innerHTML = ''; // Kosongkan container sebelum mengisi
-
-                    allUcapan.forEach(entry => {
-                        const ucapanItem = document.createElement('div');
-                        ucapanItem.classList.add('ucapan-item');
-
-                        const ucapanHeader = document.createElement('p');
-                        ucapanHeader.classList.add('ucapan-header');
-
-                        const sender = document.createElement('span');
-                        sender.classList.add('ucapan-sender');
-                        // Pastikan nama field sesuai dengan yang Anda set di staticman.yml dan form
-                        sender.textContent = entry.name || 'Anonim'; // Default jika nama tidak ada
-
-                        const dateSpan = document.createElement('span');
-                        dateSpan.classList.add('ucapan-date');
-                        // Format tanggal dan waktu
-                        // Staticman menambahkan 'date' dan 'timestamp' secara default.
-                        // 'timestamp' lebih akurat untuk waktu lengkap.
-                        if (entry.timestamp) {
-                            const dateObj = new Date(entry.timestamp);
-                            // Format ke "Rabu, 11 Juni 2025 18:25:32"
-                            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZoneName: 'short' };
-                            dateSpan.textContent = dateObj.toLocaleDateString('id-ID', options);
-                        } else if (entry.date) { // Fallback jika hanya 'date' ada
-                             dateSpan.textContent = entry.date;
-                        } else {
-                            dateSpan.textContent = 'Tanggal tidak diketahui';
-                        }
-                       
-
-                        const message = document.createElement('p');
-                        message.classList.add('ucapan-message');
-                        // Pastikan nama field sesuai dengan yang Anda set di staticman.yml dan form
-                        message.textContent = entry.message || 'Tidak ada pesan.'; // Default jika pesan tidak ada
-
-                        ucapanHeader.appendChild(sender);
-                        ucapanHeader.appendChild(dateSpan);
-                        
-                        ucapanItem.appendChild(ucapanHeader);
-                        ucapanItem.appendChild(message);
-                        guestbookEntriesContainer.appendChild(ucapanItem);
-                    });
-
-                } catch (error) {
-                    console.error('Gagal memuat ucapan:', error);
-                    guestbookEntriesContainer.innerHTML = '<p style="text-align: center; color: red;">Gagal memuat ucapan. Silakan periksa konsol browser untuk detail error.</p>';
-                }
-            }
-
-            // Panggil fungsi saat halaman dimuat
-            loadGuestbookEntries();
-
-            // Opsional: Muat ulang ucapan setelah formulir dikirim
-            // Jika Anda ingin ucapan muncul secara instan setelah dikirim tanpa refresh halaman,
-            // Anda perlu menangani pengiriman formulir dengan AJAX/Fetch di JavaScript Anda
-            // dan kemudian memanggil loadGuestbookEntries() lagi.
-            // Contoh sederhana (ini tidak akan berfungsi dengan formspree action di form):
-            const guestbookForm = document.getElementById('guestbook-form');
-            if(guestbookForm) {
-                guestbookForm.addEventListener('submit', async function(event) {
-                    // Staticman akan me-redirect secara otomatis, jadi ini mungkin tidak diperlukan
-                    // kecuali Anda ingin menonaktifkan redirect default Staticman (dengan JS)
-                    // dan menangani pengiriman sendiri.
-                    // Untuk Staticman, biasanya redirect setelah kirim adalah cara termudah.
-                    // Jika Anda ingin update instan tanpa redirect, Anda perlu
-                    // mencegah redirect default Staticman dan mengirimkan data secara AJAX,
-                    // kemudian memanggil loadGuestbookEntries() setelahnya.
-                    // Ini sedikit lebih kompleks dari lingkup ini.
-                    // Saat ini, setelah kirim, halaman akan di-refresh atau di-redirect,
-                    // dan ucapan akan otomatis termuat.
-                });
-            }
+            // --- Panggil Fungsi Supabase Saat Halaman Dimuat ---
+            getAndSetInvitedGuestName(); 
+            loadGreetings(); 
+            
+            document.getElementById('greeting-form').addEventListener('submit', submitGreeting);
         });
     </script>
 </body>
