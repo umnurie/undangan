@@ -175,7 +175,7 @@
         .fade-out { 
             opacity: 0; 
             visibility: hidden; 
-}
+        }
         /* Keyframe untuk animasi fade-in */
         @keyframes fadeIn { 
             from { opacity: 0; } 
@@ -443,37 +443,6 @@
         }
         form textarea { 
             resize: vertical; 
-        }
-        /* Style untuk item ucapan */
-        .ucapan-item {
-            background: var(--white-color);
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom: 1.5rem;
-            text-align: left; /* Sesuaikan agar teks tidak rata tengah */
-        }
-        .ucapan-item:last-child {
-            margin-bottom: 0;
-        }
-        .ucapan-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 0.5rem;
-        }
-        .ucapan-sender {
-            font-weight: 600;
-            color: var(--text-color);
-            font-size: 1.1rem;
-        }
-        .ucapan-date {
-            font-size: 0.8rem;
-            color: var(--accent-color);
-        }
-        .ucapan-message {
-            line-height: 1.6;
-            color: var(--text-color);
         }
 
         /* Gaya untuk Gift Section */
@@ -866,20 +835,24 @@
 
         <section id="rsvp-section-id" class="rsvp-section fade-in-up">
             <h2>Konfirmasi Kehadiran & Ucapan</h2>
-            <form id="greeting-form">
-                <label for="sender-name">Nama Anda:</label>
-                <input type="text" id="sender-name" required placeholder="Nama Anda">
+            <form action="https://staticman-app.herokuapp.com/v3/entry/github/umnurie/undangan/main" method="POST" id="guestbook-form">
+                <input name="options[redirect]" type="hidden" value="https://robi-astri-invitation.netlify.app/">
+                <input name="options[slug]" type="hidden" value="ucapan-dari-tamu">
+                <input name="options[origin]" type="hidden" value="https://robi-astri-invitation.netlify.app/">
 
-                <label for="greeting-message">Ucapan Anda:</label>
-                <textarea id="greeting-message" rows="5" required></textarea>
-
-                <button type="submit" class="btn">Kirim Ucapan</button>
-                <p id="greeting-status"></p>
+                <input type="text" name="fields[name]" placeholder="Nama Anda" required>
+                <select name="fields[konfirmasi]" required>
+                    <option value="" disabled selected>Konfirmasi Kehadiran</option>
+                    <option value="Hadir">Hadir</option>
+                    <option value="Tidak Hadir">Tidak Hadir</option>
+                </select>
+                <textarea name="fields[message]" placeholder="Tulis ucapan dan doa Anda..." rows="5"></textarea>
+                <button type="submit" class="btn">Kirim</button>
             </form>
 
             <div class="ucapan-display-area">
                 <h3>Ucapan & Doa</h3>
-                <div id="greetings-display">
+                <div id="guestbook-entries">
                     <p style="text-align: center; color: var(--accent-color);">Memuat ucapan...</p>
                 </div>
             </div>
@@ -891,7 +864,6 @@
         </footer>
     </main>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             
@@ -903,157 +875,6 @@
             const audioPlayer = document.getElementById('audio-player'); // Kontainer tombol play/pause
             const playPauseBtn = document.getElementById('play-pause-btn');
             const bottomNav = document.getElementById('bottom-nav'); // Navigasi bawah
-
-            // --- Konfigurasi Supabase Anda ---
-            const SUPABASE_URL = 'https://wzzgrzzkfqwmjdiqwpvl.supabase.co'; // GANTI DENGAN PROJECT URL ASLI KAMU
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6emdyenprZnF3bWpkaXF3cHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTExMjYyNTAsImV4cCI6MjA2NjcwMjI1MH0.oojHFe72kVU_rDIcVG_g-3YT5xXktvCUpN4FRT8K9Ik'; // GANTI DENGAN ANON KEY ASLI KAMU
-
-            const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            // --- Akhir Konfigurasi Supabase ---
-
-            let invitedGuestName = 'Tamu Undangan'; // Default value untuk tampilan cover
-            let invitedGuestId = null; // To store the unique_id if found
-
-            // --- Fungsi Bantuan untuk Membaca Parameter URL ---
-            function getUrlParameter(name) {
-                name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-                var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-                var results = regex.exec(location.search);
-                return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-            }
-
-            // --- Fungsi untuk Mendapatkan Nama Tamu Berdasarkan URL ID (hanya untuk tampilan cover) ---
-            async function getAndSetInvitedGuestName() {
-                invitedGuestId = getUrlParameter('id'); // Ambil 'id' dari URL
-
-                const guestNameElement = document.getElementById('guest-name'); // Target untuk nama di cover
-                const senderNameInput = document.getElementById('sender-name'); // Target untuk nama di form ucapan (tidak diisi otomatis)
-
-                if (invitedGuestId) {
-                    guestNameElement.textContent = 'Memuat nama Anda...'; // Update di cover
-                    // senderNameInput tidak lagi diisi otomatis atau di-readonly
-
-                    const { data, error } = await supabase
-                        .from('guest_list')
-                        .select('guest_name')
-                        .eq('unique_id', invitedGuestId) // Cari berdasarkan unique_id dari URL
-                        .single(); // Harusnya hanya ada 1 hasil
-
-                    if (error) {
-                        console.error('Error fetching invited guest name:', error);
-                        guestNameElement.textContent = 'Nama Tamu Tidak Ditemukan.';
-                        // senderNameInput akan tetap kosong, siap diisi manual
-                        return;
-                    }
-
-                    if (data) {
-                        invitedGuestName = data.guest_name;
-                        guestNameElement.textContent = invitedGuestName; // Tampilkan nama di cover
-                        // senderNameInput.value = invitedGuestName; // DIHAPUS
-                        // senderNameInput.readOnly = true; // DIHAPUS
-                    } else {
-                        guestNameElement.textContent = 'ID undangan tidak valid.'; // Tampilkan di cover jika ID tidak valid
-                        // senderNameInput akan tetap kosong, siap diisi manual
-                    }
-                } else {
-                    // Jika tidak ada ID di URL, biarkan tamu mengisi nama secara manual
-                    guestNameElement.textContent = 'Tamu Undangan'; // Default di cover
-                    // senderNameInput akan tetap kosong, siap diisi manual
-                }
-            }
-
-            // --- Fungsi untuk Mengirim Ucapan ---
-            async function submitGreeting(event) {
-                event.preventDefault(); // Mencegah form refresh halaman
-
-                // Selalu ambil nama dari input yang diketik pengguna
-                const senderName = document.getElementById('sender-name').value;
-                const message = document.getElementById('greeting-message').value;
-                const statusElement = document.getElementById('greeting-status');
-
-                if (!senderName.trim()) {
-                    statusElement.textContent = 'Nama Anda tidak boleh kosong.';
-                    statusElement.style.color = 'red';
-                    return;
-                }
-
-                statusElement.textContent = 'Mengirim...';
-                statusElement.style.color = '#000';
-
-                const { error } = await supabase
-                    .from('greetings')
-                    .insert({
-                        sender_name: senderName,
-                        message: message
-                    });
-
-                if (error) {
-                    console.error('Error submitting greeting:', error);
-                    statusElement.textContent = 'Gagal mengirim ucapan. Silakan coba lagi.';
-                    statusElement.style.color = 'red';
-                } else {
-                    statusElement.textContent = 'Ucapan Anda berhasil dikirim! Terima kasih.';
-                    statusElement.style.color = 'green';
-                    document.getElementById('greeting-form').reset(); // Reset form
-                    // document.getElementById('sender-name').value = senderName; // DIHAPUS - tidak perlu mengisi ulang karena sudah dikosongkan
-                    loadGreetings(); // Muat ulang ucapan setelah berhasil dikirim
-                }
-            }
-
-            // --- Fungsi untuk Menampilkan Ucapan yang Sudah Ada ---
-            async function loadGreetings() {
-                const { data, error } = await supabase
-                    .from('greetings')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                const greetingsDisplay = document.getElementById('greetings-display');
-                greetingsDisplay.innerHTML = ''; // Bersihkan kontainer
-
-                if (error) {
-                    console.error('Error loading greetings:', error);
-                    greetingsDisplay.textContent = 'Gagal memuat ucapan.';
-                    return;
-                }
-
-                if (data && data.length > 0) {
-                    data.forEach(greeting => {
-                        const greetingItem = document.createElement('div');
-                        greetingItem.classList.add('ucapan-item'); // Gunakan class yang sudah ada di CSS untuk styling
-
-                        const ucapanHeader = document.createElement('p');
-                        ucapanHeader.classList.add('ucapan-header');
-
-                        const sender = document.createElement('span');
-                        sender.classList.add('ucapan-sender');
-                        sender.textContent = greeting.sender_name || 'Anonim';
-
-                        const dateSpan = document.createElement('span');
-                        dateSpan.classList.add('ucapan-date');
-                        if (greeting.created_at) {
-                            const dateObj = new Date(greeting.created_at);
-                            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZoneName: 'short' };
-                            dateSpan.textContent = dateObj.toLocaleDateString('id-ID', options);
-                        } else {
-                            dateSpan.textContent = 'Tanggal tidak diketahui';
-                        }
-                       
-                        const message = document.createElement('p');
-                        message.classList.add('ucapan-message');
-                        message.textContent = greeting.message || 'Tidak ada pesan.';
-
-                        ucapanHeader.appendChild(sender);
-                        ucapanHeader.appendChild(dateSpan);
-                        
-                        greetingItem.appendChild(ucapanHeader);
-                        greetingItem.appendChild(message);
-                        greetingsDisplay.appendChild(greetingItem);
-                    });
-                } else {
-                    greetingsDisplay.textContent = 'Belum ada ucapan. Jadilah yang pertama!';
-                }
-            }
-
 
             // --- Logika untuk Tombol Buka Undangan ---
             openButton.addEventListener('click', function() {
@@ -1139,6 +960,22 @@
                 });
             });
 
+            // --- Logika untuk Menampilkan Nama Tamu dari URL ---
+            // Contoh URL: yourdomain.com/undangan.html?to=Nama_Tamu
+            const urlParams = new URLSearchParams(window.location.search);
+            const guest = urlParams.get('to');
+            const guestNameElement = document.getElementById('guest-name');
+            if (guest) {
+                guestNameElement.innerText = guest.replace(/_/g, " "); // Mengganti underscore dengan spasi
+                // Juga isi nama di form RSVP jika ada
+                const rsvpNameInput = document.querySelector('input[name="fields[name]"]'); // PERBAIKAN DI SINI
+                if (rsvpNameInput) {
+                    rsvpNameInput.value = guest.replace(/_/g, " ");
+                }
+            } else {
+                guestNameElement.innerText = "Tamu Undangan"; // Default jika tidak ada nama di URL
+            }
+
             // --- Animasi Scroll (Intersection Observer) ---
             function observeSections() {
                 const sections = document.querySelectorAll('.fade-in-up');
@@ -1198,14 +1035,135 @@
             // Inisialisasi slideshow saat halaman dimuat
             showSlide(0);
 
-            // --- Panggil Fungsi Supabase Saat Halaman Dimuat ---
-            document.addEventListener('DOMContentLoaded', () => {
-                getAndSetInvitedGuestName(); // Hanya untuk mengisi nama di cover
-                loadGreetings(); // Muat daftar ucapan dari Supabase
-                
-                // Event listener untuk form ucapan Supabase
-                document.getElementById('greeting-form').addEventListener('submit', submitGreeting);
-            });
+            // Optional: Auto-slide
+            // setInterval(() => {
+            //     showSlide(currentIndex + 1);
+            // }, 5000); // Ganti gambar setiap 5 detik
+        
+            // --- Bagian untuk menampilkan Ucapan ---
+            const guestbookEntriesContainer = document.getElementById('guestbook-entries');
+            const repoOwner = 'umnurie'; // Ganti dengan username GitHub Anda
+            const repoName = 'undangan'; // Ganti dengan nama repositori Anda
+            const branchName = 'main'; // Ganti dengan branch utama Anda (misal: 'main' atau 'master')
+            const dataPath = '_data/guestbook'; // Sesuai dengan `path` di staticman.yml
+
+            async function loadGuestbookEntries() {
+                try {
+                    // URL untuk mendapatkan daftar file di folder guestbook
+                    // GitHub API membutuhkan header Accept untuk JSON
+                    const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${dataPath}?ref=${branchName}`;
+                    const response = await fetch(url, {
+                        headers: {
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                             guestbookEntriesContainer.innerHTML = '<p style="text-align: center;">Belum ada ucapan. Jadilah yang pertama!</p>';
+                             return;
+                        }
+                        throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+                    }
+
+                    const files = await response.json();
+                    
+                    // Filter hanya file JSON (atau YML jika Anda memilih format itu)
+                    const ucapanFiles = files.filter(file => file.name.endsWith('.json'));
+
+                    if (ucapanFiles.length === 0) {
+                        guestbookEntriesContainer.innerHTML = '<p style="text-align: center;">Belum ada ucapan. Jadilah yang pertama!</p>';
+                        return;
+                    }
+
+                    // Ambil konten dari setiap file ucapan
+                    const ucapanPromises = ucapanFiles.map(async file => {
+                        const fileContentUrl = file.download_url; // URL untuk langsung mendownload konten file
+                        const fileResponse = await fetch(fileContentUrl);
+                        return fileResponse.json();
+                    });
+
+                    let allUcapan = await Promise.all(ucapanPromises);
+
+                    // Sortir ucapan berdasarkan timestamp (terbaru di atas)
+                    // Staticman menyimpan timestamp sebagai string ISO, bisa langsung diurutkan
+                    allUcapan.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+
+                    guestbookEntriesContainer.innerHTML = ''; // Kosongkan container sebelum mengisi
+
+                    allUcapan.forEach(entry => {
+                        const ucapanItem = document.createElement('div');
+                        ucapanItem.classList.add('ucapan-item');
+
+                        const ucapanHeader = document.createElement('p');
+                        ucapanHeader.classList.add('ucapan-header');
+
+                        const sender = document.createElement('span');
+                        sender.classList.add('ucapan-sender');
+                        // Pastikan nama field sesuai dengan yang Anda set di staticman.yml dan form
+                        sender.textContent = entry.name || 'Anonim'; // Default jika nama tidak ada
+
+                        const dateSpan = document.createElement('span');
+                        dateSpan.classList.add('ucapan-date');
+                        // Format tanggal dan waktu
+                        // Staticman menambahkan 'date' dan 'timestamp' secara default.
+                        // 'timestamp' lebih akurat untuk waktu lengkap.
+                        if (entry.timestamp) {
+                            const dateObj = new Date(entry.timestamp);
+                            // Format ke "Rabu, 11 Juni 2025 18:25:32"
+                            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZoneName: 'short' };
+                            dateSpan.textContent = dateObj.toLocaleDateString('id-ID', options);
+                        } else if (entry.date) { // Fallback jika hanya 'date' ada
+                             dateSpan.textContent = entry.date;
+                        } else {
+                            dateSpan.textContent = 'Tanggal tidak diketahui';
+                        }
+                       
+
+                        const message = document.createElement('p');
+                        message.classList.add('ucapan-message');
+                        // Pastikan nama field sesuai dengan yang Anda set di staticman.yml dan form
+                        message.textContent = entry.message || 'Tidak ada pesan.'; // Default jika pesan tidak ada
+
+                        ucapanHeader.appendChild(sender);
+                        ucapanHeader.appendChild(dateSpan);
+                        
+                        ucapanItem.appendChild(ucapanHeader);
+                        ucapanItem.appendChild(message);
+                        guestbookEntriesContainer.appendChild(ucapanItem);
+                    });
+
+                } catch (error) {
+                    console.error('Gagal memuat ucapan:', error);
+                    guestbookEntriesContainer.innerHTML = '<p style="text-align: center; color: red;">Gagal memuat ucapan. Silakan periksa konsol browser untuk detail error.</p>';
+                }
+            }
+
+            // Panggil fungsi saat halaman dimuat
+            loadGuestbookEntries();
+
+            // Opsional: Muat ulang ucapan setelah formulir dikirim
+            // Jika Anda ingin ucapan muncul secara instan setelah dikirim tanpa refresh halaman,
+            // Anda perlu menangani pengiriman formulir dengan AJAX/Fetch di JavaScript Anda
+            // dan kemudian memanggil loadGuestbookEntries() lagi.
+            // Contoh sederhana (ini tidak akan berfungsi dengan formspree action di form):
+            const guestbookForm = document.getElementById('guestbook-form');
+            if(guestbookForm) {
+                guestbookForm.addEventListener('submit', async function(event) {
+                    // Staticman akan me-redirect secara otomatis, jadi ini mungkin tidak diperlukan
+                    // kecuali Anda ingin menonaktifkan redirect default Staticman (dengan JS)
+                    // dan menangani pengiriman sendiri.
+                    // Untuk Staticman, biasanya redirect setelah kirim adalah cara termudah.
+                    // Jika Anda ingin update instan tanpa redirect, Anda perlu
+                    // mencegah redirect default Staticman dan mengirimkan data secara AJAX,
+                    // kemudian memanggil loadGuestbookEntries() setelahnya.
+                    // Ini sedikit lebih kompleks dari lingkup ini.
+                    // Saat ini, setelah kirim, halaman akan di-refresh atau di-redirect,
+                    // dan ucapan akan otomatis termuat.
+                });
+            }
+        });
     </script>
 </body>
 </html>
