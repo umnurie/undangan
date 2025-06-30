@@ -903,10 +903,9 @@
     <script>
         // Supabase Configuration
         // PASTIKAN SUPABASE_URL DAN SUPABASE_ANON_KEY SUDAH BENAR SESUAI DENGAN AKUN ANDA
-        const SUPABASE_URL = 'https://wzzgrzzkfqwmjdiqwpvl.supabase.co'; //
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6emdyenprZnF3bWpkaXF3cHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTExMjYyNTAsImV4cCI6MjA2NjcwMjI1MH0.oojHFe72kVU_rDIcVG_g-3YT5xXktvCUpN4FR8K9Ik'; //
-
-        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseUrl = 'https://wzzgrzzkfqwmjdiqwpvl.supabase.co'; //
+        const supabaseKey = process.env.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6emdyenprZnF3bWpkaXF3cHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTExMjYyNTAsImV4cCI6MjA2NjcwMjI1MH0.oojHFe72kVU_rDIcVG_g-3YT5xXktvCUpN4FR8K9Ik; //
+        const supabase = createClient(supabaseUrl, supabaseKey);
 
         // Function to submit a new greeting
         async function submitGreeting(event) {
