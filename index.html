@@ -1087,6 +1087,7 @@
                             sender_name: senderName,
                             message: message
                         });
+                        .select();
                         
                     console.log("Submission response:", { data, error }); // Add this line
                     
@@ -1096,6 +1097,10 @@
                     statusElement.style.color = 'green';
                     document.getElementById('sender_name').value = '';
                     document.getElementById('message').value = '';
+                    
+                    if (data && data[0]) {
+                      addGreetingToDOM(data[0]);
+                    }
                   } catch (error) {
                     console.error('Error submitting greeting:', error);
                     statusElement.textContent = 'Gagal mengirim ucapan. Silakan coba lagi.';
