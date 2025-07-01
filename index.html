@@ -731,6 +731,17 @@
         .couple-section .intro-text-source {
             margin: 0;
         }
+
+        section::before,
+        header::before,
+        footer::before {
+          pointer-events: none;
+        }
+        
+        .rsvp-section input {
+          position: relative;
+          z-index: 5;
+        }
     </style>
 </head>
 <body>
