@@ -536,7 +536,7 @@
 
         #audio-player {
             position: fixed;
-            bottom: 40px;
+            bottom: 50px;
             right: 20px;
             z-index: 99;
         }
@@ -882,16 +882,14 @@
         </section>
 
         <section id="rsvp-section-id" class="rsvp-section fade-in-up">
-            <h2>Konfirmasi Kehadiran & Ucapan</h2>
+            <h2>Ucapan & Do'a</h2>
             <form id="greeting-form">
                 <input type="text" id="sender-name" required placeholder="Nama Anda">
                 <textarea id="greeting-message" required placeholder="Tulis ucapan dan doa Anda..."></textarea>
                 <button type="submit" class="btn">Kirim Ucapan</button>
                 <p id="greeting-status"></p>
             </form>
-
-            <div class="ucapan-display-area">
-                <h3>Ucapan & Doa</h3>
+            
                 <div id="greetings-display">
                     <p style="text-align: center; color: var(--accent-color);">Memuat ucapan...</p>
                 </div>
@@ -1071,24 +1069,27 @@
                 statusElement.style.color = 'var(--text-color)';
                 
                 try {
-                    const { error } = await supabase
+                    const { data, error } = await supabase
                         .from('greetings')
                         .insert({
                             sender_name: senderName,
                             message: message
                         });
+                        
+                    console.log("Submission response:", { data, error }); // Add this line
                     
                     if (error) throw error;
                     
                     statusElement.textContent = 'Ucapan berhasil dikirim!';
                     statusElement.style.color = 'green';
-                    document.getElementById('greeting-message').value = '';
-                } catch (error) {
+                    document.getElementById('sender_name').value = '';
+                    document.getElementById('message').value = '';
+                  } catch (error) {
                     console.error('Error submitting greeting:', error);
                     statusElement.textContent = 'Gagal mengirim ucapan. Silakan coba lagi.';
                     statusElement.style.color = 'red';
-                }
-            }
+                  }
+               }
 
             function setupRealtimeUpdates() {
                 const channel = supabase
