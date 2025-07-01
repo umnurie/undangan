@@ -592,7 +592,7 @@
             }
             
             .cover-bottom-elements {
-                bottom: 60px;
+                bottom: 100px;
             }
             
             #open-invitation {
@@ -731,7 +731,7 @@
         .couple-section .intro-text-source {
             margin: 0;
         }
-
+        
         section::before,
         header::before,
         footer::before {
@@ -1087,6 +1087,7 @@
                             sender_name: senderName,
                             message: message
                         });
+                      
                         
                     console.log("Submission response:", { data, error }); // Add this line
                     
@@ -1094,12 +1095,8 @@
                     
                     statusElement.textContent = 'Ucapan berhasil dikirim!';
                     statusElement.style.color = 'green';
-                    document.getElementById('sender_name').value = '';
-                    document.getElementById('message').value = '';
-                    
-                    if (data && data.length > 0) {
-                      addGreetingToDOM(data[0]);
-                    }
+                    document.getElementById('sender-name').value = '';
+                    document.getElementById('greeting-message').value = '';
                     
                   } catch (error) {
                     console.error('Error submitting greeting:', error);
