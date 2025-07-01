@@ -946,7 +946,7 @@
                   const { data, error } = await supabase
                    .from('guest_list')
                    .select('guest_name')
-                   .eq('unique_id', invitedGuestId)
+                   .eq('id', invitedGuestId)
                    .single ();
             
                  console.log("Guest data response:", { data, error }); // Add this line
