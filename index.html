@@ -986,7 +986,32 @@
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function() {
+          if (sessionStorage.getItem('invitationOpened') === 'true') {
+            // Jika ya, langsung tampilkan konten utama dan lewati cover
+              const cover = document.getElementById('cover');
+              const mainContent = document.getElementById('main-content');
+              const bottomNav = document.getElementById('bottom-nav');
+              const audioPlayer = document.getElementById('audio-player');
+              const music = document.getElementById('bg-music');
+
+              cover.style.display = 'none'; // Langsung sembunyikan cover
+              mainContent.classList.remove('hidden');
+              bottomNav.classList.remove('hidden');
+              document.body.style.overflowY = 'auto';
+              audioPlayer.classList.remove('hidden');
+
+              // Coba putar musik, tangani jika gagal (karena beberapa browser memblokir autoplay)
+              const playPromise = music.play();
+              if (playPromise !== undefined) {
+                  playPromise.catch(error => {
+                      console.log("Autoplay on reload was prevented:", error);
+                      // Tombol play/pause tetap akan muncul untuk interaksi manual
+                  });
+              }
+          }
+            // AKHIR DARI KODE BARU
+
             // --- Elemen Utama ---
             const cover = document.getElementById('cover');
             const mainContent = document.getElementById('main-content');
@@ -1285,6 +1310,8 @@
             // --- Setup Event Listeners ---
             function setupEventListeners() {
                 openButton.addEventListener('click', function() {
+                    sessionStorage.setItem('invitationOpened', 'true'); // <-- TAMBAHKAN BARIS INI
+                    
                     cover.classList.add('fade-out');
                     mainContent.classList.remove('hidden');
                     bottomNav.classList.remove('hidden');
@@ -1329,8 +1356,8 @@
                 }, { once: true });
 
                 closePopupBtn.addEventListener('click', function() {
-                    successPopup.style.display = 'none';
-                    location.reload();
+                  sessionStorage.setItem('invitationOpened', 'true'); // Simpan status
+                  location.reload(); // Lalu refresh
                 });
             }
 
