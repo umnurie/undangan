@@ -742,6 +742,77 @@
           position: relative;
           z-index: 5;
         }
+
+        /* --- POPUP STYLES --- */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(3px); /* Efek blur di latar belakang */
+        }
+
+        .popup-content {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            width: 400px;
+            transform: scale(0.9);
+            animation: popup-scale-in 0.3s ease-out forwards;
+        }
+        
+        @keyframes popup-scale-in {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .popup-icon {
+            width: 80px;
+            height: 80px;
+            border: 4px solid #e0f2f1; /* Warna hijau muda */
+            border-radius: 50%;
+            margin: 0 auto 1.5rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-icon svg {
+            width: 45px;
+            height: 45px;
+        }
+        
+        .popup-content p {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+        }
+
+        #close-popup-btn {
+            background-color: #880e4f; /* Warna magenta tua */
+            color: white;
+            border: none;
+            padding: 12px 45px;
+            border-radius: 8px;
+            font-family: var(--secondary-font);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #close-popup-btn:hover {
+            background-color: #6a0b3d;
+        }
     </style>
 </head>
 <body>
@@ -924,6 +995,8 @@
             const audioPlayer = document.getElementById('audio-player');
             const playPauseBtn = document.getElementById('play-pause-btn');
             const bottomNav = document.getElementById('bottom-nav');
+            const successPopup = document.getElementById('success-popup');
+            const closePopupBtn = document.getElementById('close-popup-btn');
 
             // --- Konfigurasi Supabase ---
             const supabaseUrl = 'https://wzzgrzzkfqwmjdiqwpvl.supabase.co';
@@ -1019,7 +1092,6 @@
             function addGreetingToDOM(greeting) {
                 const greetingsDisplay = document.getElementById('greetings-display');
                 
-                // Jika masih loading, clear dulu
                 if (greetingsDisplay.innerHTML.includes('Memuat')) {
                     greetingsDisplay.innerHTML = '';
                 }
@@ -1059,27 +1131,26 @@
 
             async function submitGreeting(event) {
                 event.preventDefault();
-                
+
                 const senderName = document.getElementById('sender-name').value.trim();
                 const message = document.getElementById('greeting-message').value.trim();
                 const statusElement = document.getElementById('greeting-status');
-                
-                // Validasi
+
                 if (!senderName) {
                     statusElement.textContent = 'Nama tidak boleh kosong';
                     statusElement.style.color = 'red';
                     return;
                 }
-                
+
                 if (!message) {
                     statusElement.textContent = 'Ucapan tidak boleh kosong';
                     statusElement.style.color = 'red';
                     return;
                 }
-                
+
                 statusElement.textContent = 'Mengirim...';
                 statusElement.style.color = 'var(--text-color)';
-                
+
                 try {
                     const { data, error } = await supabase
                         .from('greetings')
@@ -1087,23 +1158,21 @@
                             sender_name: senderName,
                             message: message
                         });
-                      
                         
-                    console.log("Submission response:", { data, error }); // Add this line
-                    
                     if (error) throw error;
-                    
-                    statusElement.textContent = 'Ucapan berhasil dikirim!';
-                    statusElement.style.color = 'green';
+
                     document.getElementById('sender-name').value = '';
                     document.getElementById('greeting-message').value = '';
+                    statusElement.textContent = '';
                     
-                  } catch (error) {
+                    successPopup.style.display = 'flex';
+
+                } catch (error) {
                     console.error('Error submitting greeting:', error);
                     statusElement.textContent = 'Gagal mengirim ucapan. Silakan coba lagi.';
                     statusElement.style.color = 'red';
-                  }
-               }
+                }
+            }
 
             function setupRealtimeUpdates() {
                 const channel = supabase
@@ -1215,14 +1284,12 @@
 
             // --- Setup Event Listeners ---
             function setupEventListeners() {
-                // Buka undangan
                 openButton.addEventListener('click', function() {
                     cover.classList.add('fade-out');
                     mainContent.classList.remove('hidden');
                     bottomNav.classList.remove('hidden');
                     document.body.style.overflowY = 'auto';
                     
-                    // Coba mainkan musik
                     const playPromise = music.play();
                     
                     if (playPromise !== undefined) {
@@ -1234,13 +1301,11 @@
                         });
                     }
                     
-                    // Sembunyikan cover setelah animasi
                     setTimeout(() => {
                         cover.style.display = 'none';
                     }, 1000);
                 });
                 
-                // Kontrol musik
                 playPauseBtn.addEventListener('click', function() {
                     if (music.paused) {
                         music.play();
@@ -1251,27 +1316,37 @@
                     }
                 });
                 
-                // Form ucapan
                 document.getElementById('greeting-form').addEventListener('submit', submitGreeting);
                 
-                // Copy buttons
                 setupCopyButtons();
-                
-                // Scroll animations
                 setupScrollAnimations();
                 
-                // Enable audio setelah interaksi pengguna
                 document.addEventListener('click', function enableAudio() {
                     music.play().then(() => {
                         audioPlayer.classList.remove('hidden');
                     }).catch(e => console.log("Playback prevented:", e));
                     document.removeEventListener('click', enableAudio);
                 }, { once: true });
+
+                closePopupBtn.addEventListener('click', function() {
+                    successPopup.style.display = 'none';
+                    location.reload();
+                });
             }
 
             // --- Initialize App ---
             initApp();
         });
     </script>
+    
+    <div id="success-popup" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <div class="popup-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 13l4 4L19 7" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <p>Terimakasih atas ucapan & doa yang diberikan</p>
+            <button id="close-popup-btn">Close</button>
+        </div>
+    </div>
 </body>
 </html>
