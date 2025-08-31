@@ -1081,7 +1081,7 @@
 
             // --- Fungsi untuk Tamu Undangan ---
             async function getAndSetInvitedGuestName() {
-                  invitedGuestId = getUrlParameter('to');
+                  const invitedGuestName = getUrlParameter('to');
                   const guestNameElement = document.getElementById('guest-name');
     
               if (invitedGuestName) {
