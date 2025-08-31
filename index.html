@@ -1084,14 +1084,14 @@
                   invitedGuestId = getUrlParameter('to');
                   const guestNameElement = document.getElementById('guest-name');
     
-              if (invitedGuestId) {
+              if (invitedGuestName) {
                   guestNameElement.textContent = 'Memuat nama Anda...';
         
               try {
                   const { data, error } = await supabase
                    .from('guest_list')
                    .select('guest_name')
-                   .eq('id', invitedGuestId)
+                   .eq('guest_name', invitedGuestName)
                    .single ();
             
                  console.log("Guest data response:", { data, error }); // Add this line
